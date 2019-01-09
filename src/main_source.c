@@ -211,10 +211,10 @@ output_modified_read_gif( char * filename, GifFileType * g )
         fprintf( stderr, "Error EGifOpenFileName %s\n",
                 filename ) ;
         return 0 ;
-    }store_pixels
-store_pixels
-    g2->SWidth = g->SWstore_pixelsidth ;
-    g2->SHeight = g->Sstore_pixelsHeight ;
+    }
+
+    g2->SWidth = g->SWidth ;
+    g2->SHeight = g->SHeight ;
     g2->SColorResolution = g->SColorResolution ;
     g2->SBackGroundColor = g->SBackGroundColor ;
     g2->AspectByte = g->AspectByte ;
@@ -235,8 +235,7 @@ store_pixels
     return 1 ;
 }
 
-/* Stores
- */
+
 int
 store_pixels( char * filename, animated_gif * image )
 {
