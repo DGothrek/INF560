@@ -11,7 +11,7 @@
 
 #include <gif_lib.h>
 
-#define SOBELF_DEBUG 0
+#define SOBELF_DEBUG 1
 
 /* Represent one pixel from the image */
 typedef struct pixel
@@ -871,13 +871,25 @@ int main( int argc, char ** argv )
     /* Convert the pixels into grayscale */
     apply_gray_filter( image ) ;
 
+    /* GRAY FILTER Timer stop */
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
+    printf( "GRAY FILTER done in %lf s\n", duration ) ;
+    gettimeofday(&t1, NULL);
+
     /* Apply blur filter with convergence value */
     apply_blur_filter( image, 5, 20 ) ;
+
+    /* BLUR FILTER Timer stop */
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
+    printf( "BLUR FILTER done in %lf s\n", duration ) ;
+    gettimeofday(&t1, NULL);
 
     /* Apply sobel filter on pixels */
     apply_sobel_filter( image ) ;
 
-    /* FILTER Timer stop */
+    /* SOBEL Timer stop */
     gettimeofday(&t2, NULL);
 
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);

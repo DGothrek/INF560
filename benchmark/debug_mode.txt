@@ -1,0 +1,17 @@
+Image 0: l:0 t:0 w:9932 h:7016 interlace:0 localCM:(nil)
+Global CM: count:256 bpp:8 sort:0
+-> GIF w/ 1 image(s) with first image of size 9932 x 7016
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s) in 0.422603 s
+GRAY FILTER done in 0.099239 s
+BLUR FILTER done in 11.340829 s
+SOBEL done in 1.210125 s
+[DEBUG] Background color (0,0,0) -> (0,0,0)
+[DEBUG] Number of colors after background and transparency: 1
+OUTPUT: Processing image 0 (total of 1 images) -> 9932 x 7016
+[DEBUG] Found new 1 color (255,255,255)
+[DEBUG] Found new 2 color (204,204,204)
+[DEBUG] Found new 3 color (156,156,156)
+OUTPUT: found 4 color(s)
+OUTPUT: Rounding up to 4 color(s)
+Starting output to file images/processed/Campusplan-Hausnr-sobel.gif
+Export done in 0.857245 s in file images/processed/Campusplan-Hausnr-sobel.gif
