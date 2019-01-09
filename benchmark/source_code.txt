@@ -1,0 +1,74 @@
+Benchmark for the unmodified source version of the code.
+
+[sitelle INF560]$ ./run_test.sh
+mkdir obj
+gcc -O3 -Iinclude -c -o obj/dgif_lib.o src/dgif_lib.c
+gcc -O3 -Iinclude -c -o obj/egif_lib.o src/egif_lib.c
+gcc -O3 -Iinclude -c -o obj/gif_err.o src/gif_err.c
+gcc -O3 -Iinclude -c -o obj/gif_font.o src/gif_font.c
+gcc -O3 -Iinclude -c -o obj/gif_hash.o src/gif_hash.c
+gcc -O3 -Iinclude -c -o obj/gifalloc.o src/gifalloc.c
+gcc -O3 -Iinclude -c -o obj/main.o src/main.c
+gcc -O3 -Iinclude -c -o obj/openbsd-reallocarray.o src/openbsd-reallocarray.c
+gcc -O3 -Iinclude -c -o obj/quantize.o src/quantize.c
+gcc -O3 -Iinclude -lm -o sobelf obj/dgif_lib.o obj/egif_lib.o obj/gif_err.o obj/gif_font.o obj/gif_hash.o obj/gifalloc.o obj/main.o obj/openbsd-reallocarray.o obj/quantize.o
+Running test on images/original/051009.vince.gif -> images/processed/051009.vince-sobel.gif
+GIF loaded from file images/original/051009.vince.gif with 1 image(s) in 0.029386 s
+SOBEL done in 0.194737 s
+Export done in 0.208077 s in file images/processed/051009.vince-sobel.gif
+Running test on images/original/1.gif -> images/processed/1-sobel.gif
+GIF loaded from file images/original/1.gif with 10 image(s) in 0.029173 s
+SOBEL done in 0.395928 s
+Export done in 0.142450 s in file images/processed/1-sobel.gif
+Running test on images/original/200_s.gif -> images/processed/200_s-sobel.gif
+GIF loaded from file images/original/200_s.gif with 1 image(s) in 0.001098s
+SOBEL done in 0.004622 s
+Export done in 0.001472 s in file images/processed/200_s-sobel.gif
+Running test on images/original/9815573.gif -> images/processed/9815573-sobel.gif
+GIF loaded from file images/original/9815573.gif with 10 image(s) in 0.019456 s
+SOBEL done in 0.104954 s
+Export done in 0.072392 s in file images/processed/9815573-sobel.gif
+Running test on images/original/australian-flag-large.gif -> images/processed/australian-flag-large-sobel.gif
+GIF loaded from file images/original/australian-flag-large.gif with 1 image(s) in 0.007815 s
+SOBEL done in 0.116394 s
+Export done in 0.021427 s in file images/processed/australian-flag-large-sobel.gif
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr-sobel.gif
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)in 0.688870 s
+SOBEL done in 12.779492 s
+Export done in 0.907296 s in file images/processed/Campusplan-Hausnr-sobel.gif
+Running test on images/original/Campusplan-Mobilitaetsbeschraenkte.gif -> images/processed/Campusplan-Mobilitaetsbeschraenkte-sobel.gif
+GIF loaded from file images/original/Campusplan-Mobilitaetsbeschraenkte.gif with 1 image(s) in 0.535316 s
+SOBEL done in 12.769117 s
+Export done in 1.798775 s in file images/processed/Campusplan-Mobilitaetsbeschraenkte-sobel.gif
+Running test on images/original/fire.gif -> images/processed/fire-sobel.gif
+GIF loaded from file images/original/fire.gif with 33 image(s) in 0.001406s
+SOBEL done in 0.001388 s
+Export done in 0.002558 s in file images/processed/fire-sobel.gif
+Running test on images/original/frame_002.gif -> images/processed/frame_002-sobel.gif
+GIF loaded from file images/original/frame_002.gif with 1 image(s) in 0.002753 s
+SOBEL done in 0.044261 s
+Export done in 0.004375 s in file images/processed/frame_002-sobel.gif
+Running test on images/original/giphy-3.gif -> images/processed/giphy-3-sobel.gif
+GIF loaded from file images/original/giphy-3.gif with 5 image(s) in 0.108680 s
+SOBEL done in 1.273327 s
+Export done in 0.905671 s in file images/processed/giphy-3-sobel.gif
+Running test on images/original/Mandelbrot-large.gif -> images/processed/Mandelbrot-large-sobel.gif
+GIF loaded from file images/original/Mandelbrot-large.gif with 20 image(s)in 0.214345 s
+SOBEL done in 2.309287 s
+Export done in 2.303449 s in file images/processed/Mandelbrot-large-sobel.gif
+Running test on images/original/porsche.gif -> images/processed/porsche-sobel.gif
+GIF loaded from file images/original/porsche.gif with 1 image(s) in 0.001103 s
+SOBEL done in 0.003767 s
+Export done in 0.002098 s in file images/processed/porsche-sobel.gif
+Running test on images/original/Produits_sous_linux.gif -> images/processed/Produits_sous_linux-sobel.gif
+GIF loaded from file images/original/Produits_sous_linux.gif with 1 image(s) in 0.006499 s
+SOBEL done in 0.136914 s
+Export done in 0.010359 s in file images/processed/Produits_sous_linux-sobel.gif
+Running test on images/original/TimelyHugeGnu.gif -> images/processed/TimelyHugeGnu-sobel.gif
+GIF loaded from file images/original/TimelyHugeGnu.gif with 19 image(s) in0.064902 s
+SOBEL done in 0.367251 s
+Export done in 0.444369 s in file images/processed/TimelyHugeGnu-sobel.gif
+Running test on images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif -> images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large-sobel.gif
+GIF loaded from file images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif with 10 image(s) in 0.027635 s
+SOBEL done in 0.237582 s
+Export done in 0.447291 s in file images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large-sobel.gif
