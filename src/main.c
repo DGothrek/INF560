@@ -11,7 +11,7 @@
 
 #include <gif_lib.h>
 
-#define SOBELF_DEBUG 1
+#define SOBELF_DEBUG 0
 
 /* Represent one pixel from the image */
 typedef struct pixel
@@ -863,8 +863,10 @@ int main( int argc, char ** argv )
 
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
 
-    printf( "GIF loaded from file %s with %d image(s) in %lf s\n", 
-            input_filename, image->n_images, duration ) ;
+    printf( "GIF loaded from file %s with %d image(s)\n", 
+            input_filename, image->n_images ) ;
+    printf("EXECUTION TIME:\n");
+    printf("  LOADING:      %lf s\n", duration);
 
     /* FILTER Timer start */
     gettimeofday(&t1, NULL);
@@ -875,7 +877,7 @@ int main( int argc, char ** argv )
     /* GRAY FILTER Timer stop */
     gettimeofday(&t2, NULL);
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
-    printf( "GRAY FILTER done in %lf s\n", duration ) ;
+    printf("  GRAY FILTER:  %lf s\n", duration ) ;
     gettimeofday(&t1, NULL);
 
     /* Apply blur filter with convergence value */
@@ -884,7 +886,7 @@ int main( int argc, char ** argv )
     /* BLUR FILTER Timer stop */
     gettimeofday(&t2, NULL);
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
-    printf( "BLUR FILTER done in %lf s\n", duration ) ;
+    printf("  BLUR FILTER:  %lf s\n", duration ) ;
     gettimeofday(&t1, NULL);
 
     /* Apply sobel filter on pixels */
@@ -895,7 +897,7 @@ int main( int argc, char ** argv )
 
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
 
-    printf( "SOBEL done in %lf s\n", duration ) ;
+    printf("  SOBEL:        %lf s\n", duration ) ;
 
     /* EXPORT Timer start */
     gettimeofday(&t1, NULL);
@@ -908,7 +910,7 @@ int main( int argc, char ** argv )
 
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
 
-    printf( "Export done in %lf s in file %s\n", duration, output_filename ) ;
+    printf("  Export:       %lf s\n\n", duration ) ;
 
     return 0 ;
 }

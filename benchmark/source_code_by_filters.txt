@@ -1,0 +1,136 @@
+make: Nothing to be done for `all'.
+Running test on images/original/051009.vince.gif -> images/processed/051009.vince-sobel.gif
+GIF loaded from file images/original/051009.vince.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.020813 s
+  GRAY FILTER:  0.002091 s
+  BLUR FILTER:  0.171921 s
+  SOBEL:        0.024375 s
+  Export:       0.206813 s
+
+Running test on images/original/1.gif -> images/processed/1-sobel.gif
+GIF loaded from file images/original/1.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.028105 s
+  GRAY FILTER:  0.003756 s
+  BLUR FILTER:  0.350776 s
+  SOBEL:        0.032911 s
+  Export:       0.137498 s
+
+Running test on images/original/200_s.gif -> images/processed/200_s-sobel.gif
+GIF loaded from file images/original/200_s.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.000728 s
+  GRAY FILTER:  0.000058 s
+  BLUR FILTER:  0.003301 s
+  SOBEL:        0.000635 s
+  Export:       0.001345 s
+
+Running test on images/original/9815573.gif -> images/processed/9815573-sobel.gif
+GIF loaded from file images/original/9815573.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.018892 s
+  GRAY FILTER:  0.002914 s
+  BLUR FILTER:  0.093833 s
+  SOBEL:        0.018353 s
+  Export:       0.073002 s
+
+Running test on images/original/australian-flag-large.gif -> images/processed/australian-flag-large-sobel.gif
+GIF loaded from file images/original/australian-flag-large.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.007509 s
+  GRAY FILTER:  0.001098 s
+  BLUR FILTER:  0.103975 s
+  SOBEL:        0.011691 s
+  Export:       0.021597 s
+
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr-sobel.gif
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.640913 s
+  GRAY FILTER:  0.106068 s
+  BLUR FILTER:  11.072234 s
+  SOBEL:        1.185466 s
+  Export:       0.832478 s
+
+Running test on images/original/Campusplan-Mobilitaetsbeschraenkte.gif -> images/processed/Campusplan-Mobilitaetsbeschraenkte-sobel.gif
+GIF loaded from file images/original/Campusplan-Mobilitaetsbeschraenkte.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.641482 s
+  GRAY FILTER:  0.105923 s
+  BLUR FILTER:  11.097451 s
+  SOBEL:        1.189958 s
+  Export:       2.371658 s
+
+Running test on images/original/fire.gif -> images/processed/fire-sobel.gif
+GIF loaded from file images/original/fire.gif with 33 image(s)
+EXECUTION TIME:
+  LOADING:      0.001408 s
+  GRAY FILTER:  0.000104 s
+  BLUR FILTER:  0.000476 s
+  SOBEL:        0.000719 s
+  Export:       0.003470 s
+
+Running test on images/original/frame_002.gif -> images/processed/frame_002-sobel.gif
+GIF loaded from file images/original/frame_002.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.003071 s
+  GRAY FILTER:  0.000424 s
+  BLUR FILTER:  0.034040 s
+  SOBEL:        0.004137 s
+  Export:       0.004703 s
+
+Running test on images/original/giphy-3.gif -> images/processed/giphy-3-sobel.gif
+GIF loaded from file images/original/giphy-3.gif with 5 image(s)
+EXECUTION TIME:
+  LOADING:      0.137002 s
+  GRAY FILTER:  0.015882 s
+  BLUR FILTER:  1.112527 s
+  SOBEL:        0.143185 s
+  Export:       0.883940 s
+
+Running test on images/original/Mandelbrot-large.gif -> images/processed/Mandelbrot-large-sobel.gif
+GIF loaded from file images/original/Mandelbrot-large.gif with 20 image(s)
+EXECUTION TIME:
+  LOADING:      0.284420 s
+  GRAY FILTER:  0.040411 s
+  BLUR FILTER:  1.917174 s
+  SOBEL:        0.336417 s
+  Export:       2.169611 s
+
+Running test on images/original/porsche.gif -> images/processed/porsche-sobel.gif
+GIF loaded from file images/original/porsche.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.001048 s
+  GRAY FILTER:  0.000089 s
+  BLUR FILTER:  0.002284 s
+  SOBEL:        0.001084 s
+  Export:       0.001970 s
+
+Running test on images/original/Produits_sous_linux.gif -> images/processed/Produits_sous_linux-sobel.gif
+GIF loaded from file images/original/Produits_sous_linux.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.008841 s
+  GRAY FILTER:  0.001162 s
+  BLUR FILTER:  0.112005 s
+  SOBEL:        0.012947 s
+  Export:       0.010525 s
+
+Running test on images/original/TimelyHugeGnu.gif -> images/processed/TimelyHugeGnu-sobel.gif
+GIF loaded from file images/original/TimelyHugeGnu.gif with 19 image(s)
+EXECUTION TIME:
+  LOADING:      0.063783 s
+  GRAY FILTER:  0.006710 s
+  BLUR FILTER:  0.259053 s
+  SOBEL:        0.057288 s
+  Export:       0.425755 s
+
+Running test on images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif -> images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large-sobel.gif
+GIF loaded from file images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.026334 s
+  GRAY FILTER:  0.003463 s
+  BLUR FILTER:  0.193633 s
+  SOBEL:        0.029625 s
+  Export:       0.444940 s
+

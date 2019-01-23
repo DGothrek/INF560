@@ -1,4 +1,4 @@
-Benchmark for the unmodified source version of the code.
+# Benchmark for the unmodified source version of the code.
 
 [sitelle INF560]$ ./run_test.sh
 mkdir obj
