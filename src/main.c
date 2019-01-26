@@ -855,15 +855,10 @@ int main(int argc, char **argv)
 
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
 
-<<<<<<< HEAD
     printf( "GIF loaded from file %s with %d image(s)\n", 
             input_filename, image->n_images ) ;
     printf("EXECUTION TIME:\n");
     printf("  LOADING:      %lf s\n", duration);
-=======
-    printf("GIF loaded from file %s with %d image(s) in %lf s\n",
-           input_filename, image->n_images, duration);
->>>>>>> e52cc904bc1dc39e7a806f558f07bc11bd7875d6
 
     /* FILTER Timer start */
     gettimeofday(&t1, NULL);
@@ -875,13 +870,8 @@ int main(int argc, char **argv)
 
     /* GRAY FILTER Timer stop */
     gettimeofday(&t2, NULL);
-<<<<<<< HEAD
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
     printf("  GRAY FILTER:  %lf s\n", duration ) ;
-=======
-    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-    printf("GRAY FILTER done in %lf s\n", duration);
->>>>>>> e52cc904bc1dc39e7a806f558f07bc11bd7875d6
     gettimeofday(&t1, NULL);
 
     /* Apply blur filter with convergence value */
@@ -889,13 +879,8 @@ int main(int argc, char **argv)
 
     /* BLUR FILTER Timer stop */
     gettimeofday(&t2, NULL);
-<<<<<<< HEAD
     duration = (t2.tv_sec -t1.tv_sec)+((t2.tv_usec-t1.tv_usec)/1e6);
     printf("  BLUR FILTER:  %lf s\n", duration ) ;
-=======
-    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-    printf("BLUR FILTER done in %lf s\n", duration);
->>>>>>> e52cc904bc1dc39e7a806f558f07bc11bd7875d6
     gettimeofday(&t1, NULL);
 
     /* Apply sobel filter on pixels */
@@ -906,11 +891,7 @@ int main(int argc, char **argv)
 
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
 
-<<<<<<< HEAD
     printf("  SOBEL:        %lf s\n", duration ) ;
-=======
-    printf("SOBEL done in %lf s\n", duration);
->>>>>>> e52cc904bc1dc39e7a806f558f07bc11bd7875d6
 
     /* EXPORT Timer start */
     gettimeofday(&t1, NULL);
@@ -926,11 +907,7 @@ int main(int argc, char **argv)
 
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
 
-<<<<<<< HEAD
     printf("  Export:       %lf s\n\n", duration ) ;
-=======
-    printf("Export done in %lf s in file %s\n", duration, output_filename);
->>>>>>> e52cc904bc1dc39e7a806f558f07bc11bd7875d6
 
     return 0;
 }
