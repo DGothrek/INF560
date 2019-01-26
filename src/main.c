@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
-#include <mpi.h>
+
 #include <gif_lib.h>
 
 #define SOBELF_DEBUG 0
@@ -190,11 +190,6 @@ load_pixels(char *filename)
 #endif
 
     return image;
-}
-
-animated_gif *
-get_parts(*animated_gif image,int n_process, int rank){
-    
 }
 
     int output_modified_read_gif(char *filename, GifFileType *g)
@@ -817,14 +812,6 @@ void apply_sobel_filter(animated_gif *image)
 
 int main(int argc, char **argv)
 {
-    int rank, n_process;
-    int root = 0;
-
-    MPI_Init(&argc, &argv);
-
-    MPI_Comm_size(MPI_COMM_WORLD, &n_process);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
     char *input_filename;
     char *output_filename;
     animated_gif *image;
@@ -863,10 +850,8 @@ int main(int argc, char **argv)
     /* FILTER Timer start */
     gettimeofday(&t1, NULL);
 
-    animated_gif *newimage = get_parts(image, rank, n_process);
-
     /* Convert the pixels into grayscale */
-    apply_gray_filter(newimage);
+    apply_gray_filter(image);
 
     /* GRAY FILTER Timer stop */
     gettimeofday(&t2, NULL);
