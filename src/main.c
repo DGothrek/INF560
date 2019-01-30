@@ -863,30 +863,70 @@ int main(int argc, char **argv)
     /* FILTER Timer start */
     gettimeofday(&t1, NULL);
 
-
-    int im_size = *(image->width) * *(image->height) * sizeof(pixel);
-
-
+    int im, im_size;
     if (rank == root)
     {
-        // supposons une seule image pour le moement
-        MPI_Send(image->p[0], im_size, MPI_BYTE, 1, 0, MPI_COMM_WORLD);
-        
-    }
+        int im;
+        for (im = 0; im < image->n_images; im++)
+        {
+            im_size = image->width[im] * image->height[im] * sizeof(pixel);
 
-    if (rank==1) {
-        pixel * recv_image = malloc(im_size);
-        MPI_Recv(recv_image, im_size, MPI_BYTE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        int i;
-        for (i=0; i<5; i++) {
-            pixel pix = image->p[0][i];
-            pixel pix2 = recv_image[i];
-            printf("Pixel %d image départ : %d %d %d / image reçue : %d %d %d\n",
-                    i, pix.r, pix.g, pix.b, pix2.r, pix2.g, pix2.b);
+            MPI_Recv(image->p[im], im_size, MPI_BYTE, 1, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
+        /* EXPORT Timer start */
+        gettimeofday(&t1, NULL);
 
+        /* Store file from array of pixels to GIF file */
+        if (!store_pixels(output_filename, image))
+        {
+            return 1;
+        }
+
+        /* EXPORT Timer stop */
+        gettimeofday(&t2, NULL);
+
+        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+
+        printf("  Export:       %lf s\n\n", duration);
+    }
+
+    if (rank == 1)
+    {
+        /* Convert the pixels into grayscale */
+        apply_gray_filter(image);
+
+        /* GRAY FILTER Timer stop */
+        gettimeofday(&t2, NULL);
+        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+        printf("  GRAY FILTER:  %lf s\n", duration);
+        gettimeofday(&t1, NULL);
+
+        /* Apply blur filter with convergence value */
+        apply_blur_filter(image, 5, 20);
+
+        /* BLUR FILTER Timer stop */
+        gettimeofday(&t2, NULL);
+        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+        printf("  BLUR FILTER:  %lf s\n", duration);
+        gettimeofday(&t1, NULL);
+
+        /* Apply sobel filter on pixels */
+        apply_sobel_filter(image);
+
+        /* SOBEL Timer stop */
+        gettimeofday(&t2, NULL);
+
+        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+
+        printf("  SOBEL:        %lf s\n", duration);
+
+        for (im = 0; im < image->n_images; im++)
+        {
+            im_size = image->width[im] * image->height[im] * sizeof(pixel);
+
+            MPI_Send(image->p[im], im_size, MPI_BYTE, 0, im, MPI_COMM_WORLD);
+        }
     }
 
     // animated_gif *newimage = get_parts(image, rank, n_process);
