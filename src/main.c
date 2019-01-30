@@ -855,18 +855,21 @@ int main(int argc, char **argv)
 
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
 
-    printf("GIF loaded from file %s with %d image(s)\n",
-           input_filename, image->n_images);
-    printf("EXECUTION TIME:\n");
-    printf("  LOADING:      %lf s\n", duration);
-
-    /* FILTER Timer start */
-    gettimeofday(&t1, NULL);
+    if (rank == root)
+    {
+        printf("GIF loaded from file %s with %d image(s)\n",
+               input_filename, image->n_images);
+        printf("EXECUTION TIME:\n");
+        printf("  LOADING:      %lf s\n", duration);
+    }
 
     int im, im_size;
     if (rank == root)
     {
         int node;
+
+        /* FILTER Timer start */
+        gettimeofday(&t1, NULL);
         for (im = 0; im < image->n_images; im++)
         {
             im_size = image->width[im] * image->height[im] * sizeof(pixel);
@@ -874,6 +877,11 @@ int main(int argc, char **argv)
             node = im % (n_process - 1) + 1;
             MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
+
+        gettimeofday(&t2, NULL);
+        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+
+        printf("  Paral filters: %lf s\n\n", duration);
 
         /* EXPORT Timer start */
         gettimeofday(&t1, NULL);
@@ -894,60 +902,34 @@ int main(int argc, char **argv)
 
     else
     {
-        // animated_gif of 1 image used to apply filters
-        printf("RANK %d working\n", rank);
 
+        // animated_gif of 1 image used to apply filters on it
         animated_gif *work_gif = (animated_gif *)malloc(sizeof(animated_gif));
         work_gif->n_images = 1;
         work_gif->g = image->g;
         int *width = (int *)malloc(sizeof(int));
         int *height = (int *)malloc(sizeof(int));
-        pixel** new_p = malloc( 1 * sizeof(pixel*) );
+        pixel **new_p = malloc(1 * sizeof(pixel *));
 
         for (im = rank - 1; im < image->n_images; im += n_process - 1)
         {
-            printf("RANK %d work on image n°%d\n", rank, im);
+            /*  */
+            printf("  Node %d working on image n°%d\n", rank, im);
             *width = image->width[im];
             *height = image->height[im];
             work_gif->width = width;
             work_gif->height = height;
 
-
             im_size = (*width) * (*height) * sizeof(pixel);
             new_p[0] = image->p[im];
             work_gif->p = new_p;
 
-            printf("Work_gif created by rank %d", rank);
-
             /* Convert the pixels into grayscale */
             apply_gray_filter(work_gif);
-
-            /* GRAY FILTER Timer stop */
-            gettimeofday(&t2, NULL);
-            duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-            printf("  GRAY FILTER:  %lf s\n", duration);
-            gettimeofday(&t1, NULL);
-
-            /* Apply blur filter with convergence value */
             apply_blur_filter(work_gif, 5, 20);
-
-            /* BLUR FILTER Timer stop */
-            gettimeofday(&t2, NULL);
-            duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-            printf("  BLUR FILTER:  %lf s\n", duration);
-            gettimeofday(&t1, NULL);
-
-            /* Apply sobel filter on pixels */
             apply_sobel_filter(work_gif);
 
-            /* SOBEL Timer stop */
-            gettimeofday(&t2, NULL);
-            duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-
-            printf("  SOBEL:        %lf s\n", duration);
-
             // ---- Sending back to root ----
-
             MPI_Send(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD);
         }
     }
