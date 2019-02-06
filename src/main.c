@@ -9,6 +9,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <mpi.h>
+#include <omp.h>
 #include <gif_lib.h>
 
 #define SOBELF_DEBUG 0
@@ -565,29 +566,33 @@ int store_pixels(char *filename, animated_gif *image)
 
 void apply_gray_filter(animated_gif *image)
 {
-    int i, j;
     pixel **p;
 
     p = image->p;
-
-    for (i = 0; i < image->n_images; i++)
+#pragma omp parallel shared(p) {
+    int i, j;
+#pragma omp for collapse(2) schedule(dynamic)
     {
-        for (j = 0; j < image->width[i] * image->height[i]; j++)
+        for (i = 0; i < image->n_images; i++)
         {
-            int moy;
+            for (j = 0; j < image->width[i] * image->height[i]; j++)
+            {
+                int moy;
 
-            // moy = p[i][j].r/4 + ( p[i][j].g * 3/4 ) ;
-            moy = (p[i][j].r + p[i][j].g + p[i][j].b) / 3;
-            if (moy < 0)
-                moy = 0;
-            if (moy > 255)
-                moy = 255;
+                // moy = p[i][j].r/4 + ( p[i][j].g * 3/4 ) ;
+                moy = (p[i][j].r + p[i][j].g + p[i][j].b) / 3;
+                if (moy < 0)
+                    moy = 0;
+                if (moy > 255)
+                    moy = 255;
 
-            p[i][j].r = moy;
-            p[i][j].g = moy;
-            p[i][j].b = moy;
+                p[i][j].r = moy;
+                p[i][j].g = moy;
+                p[i][j].b = moy;
+            }
         }
     }
+}
 }
 
 #define CONV(l, c, nb_c) \
