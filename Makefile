@@ -32,10 +32,10 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+	$(CC) $(CFLAGS) -fopenmp -c -o $@ $^
 
 sobelf:$(OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -fopenmp $(LDFLAGS) -o $@ $^
 
 clean:
 	rm -f sobelf $(OBJ)
