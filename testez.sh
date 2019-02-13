@@ -11,8 +11,9 @@ DEST=../images/processed/1.gif
 echo "Running test on $i -> $DEST"
 
 cd traces
+rm -f *
 
-salloc -N 1 -n 8 mpirun eztrace -t mpi ../sobelf $i $DEST
+salloc -N 1 -n 4 mpirun eztrace -t mpi ../sobelf $i $DEST
 
 eztrace_convert ${USER}_eztrace_log_rank_*
 

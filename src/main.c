@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <sys/time.h>
 #include <mpi.h>
@@ -842,6 +843,37 @@ animated_gif *load_image_seq(char *input_filename)
   return image;
 }
 
+animated_gif *load_image_mpi(char *input_filename, int root)
+{
+  animated_gif *image;
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+#if DISPLAY_TIME
+  struct timeval t1, t2;
+  double duration;
+  gettimeofday(&t1, NULL);
+#endif
+
+  /* Load file and store the pixels in array */
+  image = load_pixels(input_filename);
+
+#if DISPLAY_TIME
+  gettimeofday(&t2, NULL);
+  duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+
+  if (rank == root)
+  {
+    printf("GIF loaded from file %s with %d image(s)\n",
+           input_filename, image->n_images);
+    printf("EXECUTION TIME:\n");
+    printf("  LOADING:      %lf s\n", duration);
+  }
+#endif
+
+  return image;
+}
+
 void apply_filters_seq(animated_gif *image)
 {
 #if DISPLAY_TIME
@@ -851,7 +883,7 @@ void apply_filters_seq(animated_gif *image)
 #endif
 
   /* Convert the pixels into grayscale */
-  apply_gray_filter( image );
+  apply_gray_filter(image);
 
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
@@ -895,7 +927,16 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
   gettimeofday(&t1, NULL);
 #endif
 
+  // an animated_gif is created, with 1 image, to apply filters on it
+  animated_gif *work_gif = (animated_gif *)malloc(sizeof(animated_gif));
+  work_gif->n_images = 1;
+  work_gif->g = image->g;
+  int *width = (int *)malloc(sizeof(int));
+  int *height = (int *)malloc(sizeof(int));
+  pixel **new_p = malloc(1 * sizeof(pixel *));
+
   int im, im_size;
+
   if (rank == root)
   {
     int node;
@@ -904,8 +945,36 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
     {
       im_size = image->width[im] * image->height[im] * sizeof(pixel);
 
-      node = im % (n_process - 1) + 1;
-      MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      node = im % n_process;
+
+      /** If node is root, work on the image. 
+          Else, receive the image from the node */
+
+      if (node == root)
+      {
+        printf("  Node %d working on image n°%d\n", rank, im);
+        *width = image->width[im];
+        *height = image->height[im];
+        work_gif->width = width;
+        work_gif->height = height;
+
+        im_size = (*width) * (*height) * sizeof(pixel);
+        new_p[0] = image->p[im];
+        work_gif->p = new_p;
+
+        /* Convert the pixels into grayscale */
+        apply_gray_filter(work_gif);
+        apply_blur_filter(work_gif, 5, 20);
+        apply_sobel_filter(work_gif);
+
+        /* Copy work_gif into the image */
+        memcpy(image->p[im], work_gif->p[0], im_size);
+      }
+
+      else
+      {
+        MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      }
     }
 
 #if DISPLAY_TIME
@@ -930,16 +999,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
 
   else
   {
-
-    // animated_gif of 1 image used to apply filters on it
-    animated_gif *work_gif = (animated_gif *)malloc(sizeof(animated_gif));
-    work_gif->n_images = 1;
-    work_gif->g = image->g;
-    int *width = (int *)malloc(sizeof(int));
-    int *height = (int *)malloc(sizeof(int));
-    pixel **new_p = malloc(1 * sizeof(pixel *));
-
-    for (im = rank - 1; im < image->n_images; im += n_process - 1)
+    for (im = rank; im < image->n_images; im += n_process)
     {
       /*  */
       printf("  Node %d working on image n°%d\n", rank, im);
@@ -1012,22 +1072,34 @@ int main(int argc, char **argv)
   input_filename = argv[1];
   output_filename = argv[2];
 
-  /* IMPORTING the original image */
-  /* Change the function call below for parallelized loading */
-  image = load_image_seq(input_filename);
-  if (image == NULL)
+  int mpi = 1;
+
+  /* Code paralellized with mpi */
+  if (mpi)
   {
-    return 1;
+    /* IMPORTING the original image */
+    image = load_image_mpi(input_filename, root);
+    if (image == NULL)
+    {
+      return 1;
+    }
+
+    /* FILTERING: apply filters */
+    /* Decision to be taken depending on the size, nb of images... */
+    apply_filters_mpi(image, output_filename);
   }
-  /* FILTERING: apply filters */
-  /* Decision to be taken depending on the size, nb of images... */
 
-  // SEQUENTIAL:
-  // apply_filters_seq( image );
-  // export_seq(output_filename, image);
-
-  // PARALLEL:
-  apply_filters_mpi( image, output_filename );
+  /* Sequential */
+  else
+  {
+    image = load_image_seq(input_filename);
+    if (image == NULL)
+    {
+      return 1;
+    }
+    apply_filters_seq(image);
+    export_seq(output_filename, image);
+  }
 
   MPI_Finalize();
   return 0;
