@@ -1,0 +1,411 @@
+%EventDef PajeDefineContainerType 0
+% Name string
+% Type string
+% Alias string
+%EndEventDef
+%EventDef PajeDefineStateType 1
+% Name string
+% Type string
+% Alias string
+%EndEventDef
+%EventDef PajeDefineEventType 2
+% Name string
+% Type string
+% Alias string
+%EndEventDef
+%EventDef PajeDefineVariableType 3
+% Name string
+% Type string
+% Color color
+% Alias string
+%EndEventDef
+%EventDef PajeDefineLinkType 4
+% Name string
+% Type string
+% StartContainerType string
+% EndContainerType string
+% Alias string
+%EndEventDef
+%EventDef PajeDefineEntityValue 5
+% Type string
+% Name string
+% Color color
+% Alias string
+%EndEventDef
+%EventDef PajeCreateContainer 7
+% Time date
+% Name string
+% Type string
+% Container string
+% Alias string
+%EndEventDef
+%EventDef PajeDestroyContainer 8
+% Time date
+% Name string
+% Type string
+%EndEventDef
+%EventDef PajeSetState 10
+% Time date
+% Type string
+% Container string
+% Value string
+%EndEventDef
+%EventDef PajePushState 11
+% Time date
+% Type string
+% Container string
+% Value string
+%EndEventDef
+%EventDef PajePushState 14
+% Time date
+% Type string
+% Container string
+% Value string
+% Extra string
+%EndEventDef
+%EventDef PajePopState 12
+% Time date
+% Type string
+% Container string
+%EndEventDef
+%EventDef PajeResetState 13
+% Time date
+% Type string
+% Container string
+%EndEventDef
+%EventDef PajeNewEvent 20
+% Time date
+% Type string
+% Container string
+% Value string
+%EndEventDef
+%EventDef PajeSetVariable 30
+% Time date
+% Type string
+% Container string
+% Value double
+%EndEventDef
+%EventDef PajeAddVariable 31
+% Time date
+% Type string
+% Container string
+% Value double
+%EndEventDef
+%EventDef PajeSubVariable 32
+% Time date
+% Type string
+% Container string
+% Value double
+%EndEventDef
+%EventDef PajeStartLink 40
+% Time date
+% Type string
+% Container string
+% StartContainer string
+% Value string
+% Key string
+%EndEventDef
+%EventDef PajeEndLink 41
+% Time date
+% Type string
+% Container string
+% EndContainer string
+% Value string
+% Key string
+%EndEventDef
+0 "Program" "0" "CT_Program"
+0 "Process" "CT_Program" "CT_Process"
+0 "Thread" "CT_Process" "CT_Thread"
+1 "Program state" "CT_Program" "ST_Program"
+1 "Process state" "CT_Process" "ST_Process"
+1 "Thread state" "CT_Thread" "ST_Thread"
+1 "User state" "CT_Thread" "ST_User"
+5 "ST_Thread" "EZTrace Flush" "1.0 1.0 1.0" "STV_FLUSH"
+5 "ST_Thread" "Blocked" "1.0 0.0 0.0" "STV_Blocked"
+5 "ST_Thread" "Working" "0.0 0.0 1.0" "STV_Working"
+5 "ST_Thread" "Critical Section" "0.0 1.0 0.0" "STV_Critical"
+5 "ST_User" "User Event" "0.0 1.0 0.0" "STV_User_Event_Green"
+5 "ST_User" "User Event" "1.0 0.0 0.0" "STV_User_Event_Red"
+5 "ST_User" "User Event" "0.1 0.5 0.8" "STV_User_Event_Blue"
+5 "ST_User" "User Event" "1.0 1.0 0.0" "STV_User_Event_Yellow"
+5 "ST_User" "User Event" "1.0 0.0 1.0" "STV_User_Event_Pink"
+5 "ST_Thread" "EZTrace synchronization" "1.0 1.0 1.0" "STV_EZTRACE_SYNC"
+2 "User Event" "CT_Thread" "E_UserEvent"
+2 "SIGNAL Received" "CT_Thread" "E_SigSegv"
+3 "Current CPU" "CT_Thread" "0 0 0" "V_CURCPU"
+5 "ST_Thread" "stdio_read" "0.0 0.0 0.0" "stdio_read"
+5 "ST_Thread" "stdio_pread" "0.0 0.0 0.0" "stdio_pread"
+5 "ST_Thread" "stdio_readv" "0.0 0.0 0.0" "stdio_readv"
+5 "ST_Thread" "stdio_fread" "0.0 0.0 0.0" "stdio_fread"
+5 "ST_Thread" "stdio_write" "0.0 0.0 0.0" "stdio_write"
+5 "ST_Thread" "stdio_pwrite" "0.0 0.0 0.0" "stdio_pwrite"
+5 "ST_Thread" "stdio_writev" "0.0 0.0 0.0" "stdio_writev"
+5 "ST_Thread" "stdio_fwrite" "0.0 0.0 0.0" "stdio_fwrite"
+5 "ST_Thread" "stdio_select" "0.0 0.0 0.0" "stdio_select"
+5 "ST_Thread" "stdio_pselect" "0.0 0.0 0.0" "stdio_pselect"
+5 "ST_Thread" "stdio_lseek" "0.0 0.0 0.0" "stdio_lseek"
+5 "ST_Thread" "stdio_poll" "0.0 0.0 0.0" "stdio_poll"
+5 "ST_Thread" "stdio_ppoll" "0.0 0.0 0.0" "stdio_ppoll"
+2 "SemPost" "CT_Thread" "E_SemPost"
+2 "SemWait done" "CT_Thread" "E_SemWait_Done"
+2 "Mutex Lock" "CT_Thread" "E_Mutex_Lock"
+2 "Mutex Unlock" "CT_Thread" "E_Mutex_Unlock"
+2 "Cond Signal" "CT_Thread" "E_CondSignal"
+2 "Waiting for a lock" "CT_Thread" "E_LockStart"
+2 "Lock acquired" "CT_Thread" "E_LockStop"
+5 "ST_Thread" "Blocked on a semaphore" "1.0 0.0 0.0" "STV_Blocked_sem"
+5 "ST_Thread" "Blocked on a spinlock" "1.0 0.0 0.0" "STV_Blocked_spin"
+5 "ST_Thread" "Blocked on a mutex" "1.0 0.0 0.0" "STV_Blocked_mutex"
+5 "ST_Thread" "Blocked on a condition" "1.0 0.0 0.0" "STV_Blocked_condition"
+5 "ST_Thread" "Blocked on a rwlock" "1.0 0.0 0.0" "STV_Blocked_rwlock"
+5 "ST_Thread" "Blocked on a barrier" "1.0 0.0 0.0" "STV_Blocked_barrier"
+5 "ST_Thread" "Critical Section (semaphore)" "0.0 1.0 0.0" "STV_Critical_sem"
+5 "ST_Thread" "Critical Section (spinlock)" "0.0 1.0 0.0" "STV_Critical_spin"
+5 "ST_Thread" "Critical Section (mutex)" "0.0 1.0 0.0" "STV_Critical_mutex"
+5 "ST_Thread" "Critical Section (condition)" "0.0 1.0 0.0" "STV_Critical_condition"
+5 "ST_Thread" "Critical Section (rwlock)" "0.0 1.0 0.0" "STV_Critical_rwlock"
+4 "OpenMP Parallel Section" "CT_Program" "CT_Thread" "CT_Thread" "GOMP_Section_Link"
+5 "ST_Thread" "GOMP_Section_State" "1.0 0.0 1.0" "GOMP_Section_State"
+5 "ST_Thread" "GOMP_Critical" "0.0 1.0 0.0" "GOMP_Critical"
+5 "ST_Thread" "GOMP_Atomic" "0.0 1.0 0.0" "GOMP_Atomic"
+5 "ST_Thread" "GOMP_Barrier" "1.0 0.6 0.0" "GOMP_Barrier"
+5 "ST_Thread" "GOMP_Implicit_Barrier" "1.0 0.0 0.0" "GOMP_Implicit_Barrier"
+5 "ST_Thread" "GOMP_For" "0.8 0.8 0.8" "GOMP_For"
+5 "ST_Thread" "GOMP_Master" "1.0 1.0 1.0" "GOMP_Master"
+5 "ST_Thread" "Blocked on an OpenMP lock" "1.0 0.0 0.0" "STV_GOMP_Lock"
+5 "ST_Thread" "Holding an OpenMP lock" "0.0 1.0 0.0" "STV_GOMP_Locked"
+5 "ST_Thread" "Blocked on an OpenMP nested lock" "1.0 0.0 0.0" "STV_GOMP_NLock"
+5 "ST_Thread" "Holding an OpenMP nested lock" "0.0 1.0 0.0" "STV_GOMP_NLocked"
+5 "ST_Thread" "GOMP_TaskWait" "1.0 0.6 0.0" "GOMP_TaskWait"
+5 "ST_Thread" "GOMP_Task" "1.0 1.0 1.0" "GOMP_Task"
+5 "ST_Thread" "GOMP_Untied_Task" "0.0 1.0 1.0" "GOMP_Untied_Task"
+5 "ST_Thread" "Creating an OpenMP Task" "0.3 0.4 0.1" "GOMP_Task_Create"
+5 "ST_Thread" "Creating an OpenMP Task" "0.1 0.5 0.8" "GOMP_Untied_Task_Create"
+5 "ST_Thread" "Sending" "1.0 0.6 0.0" "STV_MPI_Send"
+5 "ST_Thread" "MPI_Isend" "1.0 0.6 0.0" "STV_MPI_Isend"
+5 "ST_Thread" "MPI_Ibsend" "1.0 0.6 0.0" "STV_MPI_Ibsend"
+5 "ST_Thread" "MPI_Issend" "1.0 0.6 0.0" "STV_MPI_Issend"
+5 "ST_Thread" "MPI_Irsend" "1.0 0.6 0.0" "STV_MPI_Irsend"
+5 "ST_Thread" "SendRecv" "1.0 0.6 0.0" "STV_MPI_Sendrecv"
+5 "ST_Thread" "Receiving" "0.6 0.1 0.9" "STV_MPI_Recv"
+5 "ST_Thread" "MPI_Irecv" "0.6 0.1 0.9" "STV_MPI_Irecv"
+5 "ST_Thread" "MPI_Wait" "1.0 0.0 0.0" "STV_MPI_Wait"
+5 "ST_Thread" "MPI_Barrier" "1.0 0.0 1.0" "STV_MPI_Barrier"
+5 "ST_Thread" "MPI_BCast" "1.0 0.0 1.0" "STV_MPI_BCast"
+5 "ST_Thread" "MPI_Gather" "1.0 0.0 1.0" "STV_MPI_Gather"
+5 "ST_Thread" "MPI_Scatter" "1.0 0.0 1.0" "STV_MPI_Scatter"
+5 "ST_Thread" "MPI_Allgather" "1.0 0.0 1.0" "STV_MPI_Allgather"
+5 "ST_Thread" "MPI_Alltoall" "1.0 0.0 1.0" "STV_MPI_Alltoall"
+5 "ST_Thread" "MPI_Reduce" "1.0 0.0 1.0" "STV_MPI_Reduce"
+5 "ST_Thread" "MPI_Allreduce" "1.0 0.0 1.0" "STV_MPI_Allreduce"
+5 "ST_Thread" "MPI_Reduce_scatter" "1.0 0.0 1.0" "STV_MPI_reduce_scatter"
+5 "ST_Thread" "MPI_Scan" "1.0 0.0 1.0" "STV_MPI_Scan"
+5 "ST_Thread" "MPI_Ibarrier" "1.0 0.0 1.0" "STV_MPI_Ibarrier"
+5 "ST_Thread" "MPI_Ibcast" "1.0 0.0 1.0" "STV_MPI_Ibcast"
+5 "ST_Thread" "MPI_Igather" "1.0 0.0 1.0" "STV_MPI_Igather"
+5 "ST_Thread" "MPI_Iscatter" "1.0 0.0 1.0" "STV_MPI_Iscatter"
+5 "ST_Thread" "MPI_Iallgather" "1.0 0.0 1.0" "STV_MPI_Iallgather"
+5 "ST_Thread" "MPI_Ialltoall" "1.0 0.0 1.0" "STV_MPI_Ialltoall"
+5 "ST_Thread" "MPI_Ireduce" "1.0 0.0 1.0" "STV_MPI_Ireduce"
+5 "ST_Thread" "MPI_Iallreduce" "1.0 0.0 1.0" "STV_MPI_Iallreduce"
+5 "ST_Thread" "MPI_Ireduce_scatter" "1.0 0.0 1.0" "STV_MPI_Ireduce_scatter"
+5 "ST_Thread" "MPI_Iscan" "1.0 0.0 1.0" "STV_MPI_Iscan"
+5 "ST_Thread" "MPI_Probe" "0.6 0.1 0.9" "STV_MPI_Probe"
+4 "MPI collective communication" "CT_Program" "CT_Thread" "CT_Thread" "L_MPI_Coll"
+4 "MPI point to point communication" "CT_Program" "CT_Thread" "CT_Thread" "L_MPI_P2P"
+4 "MPI SPAWN" "CT_Program" "CT_Thread" "CT_Thread" "L_MPI_SPAWN"
+2 "MPI Send" "CT_Thread" "E_MPI_CommSend"
+2 "MPI Recv" "CT_Thread" "E_MPI_CommRecv"
+2 "End of an MPI communication" "CT_Thread" "E_MPI_EndComm"
+2 "MPI_Probe" "CT_Thread" "E_MPI_Probe_success"
+2 "MPI_IProbe success" "CT_Thread" "E_MPI_Iprobe_success"
+2 "MPI_IProbe failed" "CT_Thread" "E_MPI_Iprobe_failed"
+3 "Memory used" "CT_Process" "0 0 0" "V_Mem"
+0 "GPU" "0" "CT_GPU"
+1 "GPU" "CT_GPU" "ST_GPU"
+4 "kernel" "CT_Process" "CT_Thread" "CT_GPU" "hToD_kernel"
+4 "memcpy" "CT_Process" "CT_Thread" "CT_GPU" "HToD_memcpy"
+4 "memcpy" "CT_Process" "CT_GPU" "CT_Thread" "DToH_memcpy"
+4 "memcpy" "CT_Process" "CT_Thread" "CT_Thread" "HToH_memcpy"
+4 "memcpy" "CT_Process" "CT_GPU" "CT_GPU" "DToD_memcpy"
+5 "ST_Thread" "cuda_cuMemAlloc" "1.0 1.0 0.0" "cuda_cuMemAlloc"
+5 "ST_Thread" "cuda_cuLaunchKernel" "0.0 1.0 0.0" "cuda_cuLaunchKernel"
+5 "ST_Thread" "cuda_cudaThreadSynchronize" "1.0 0.0 0.0" "cuda_cudaThreadSynchronize"
+5 "ST_Thread" "cuda_cuMemcpy" "0.0 0.0 0.0" "cuda_cuMemcpy"
+5 "ST_GPU" "cuda_gpu_kernel" "0.0 1.0 0.0" "cuda_gpu_kernel"
+5 "ST_GPU" "cuda_gpu_memcpy" "0.0 0.0 0.0" "cuda_gpu_memcpy"
+5 "ST_GPU" "cuda_gpu_idle" "1.0 0.0 0.0" "cuda_gpu_idle"
+3 "Memory used" "CT_GPU" "0 0 0" "V_GPU_Mem"
+7 0.0000000000000e+00 "Program" "CT_Program" 0 "C_Prog"
+7 0.0000000000000e+00 "P#0" "CT_Process" "C_Prog" "P#0"
+7 0.0000000000000e+00 "P#0_T#1594439488" "CT_Thread" "P#0" "P#0_T#1594439488"
+10 0.0000000000000e+00 "ST_Thread" "P#0_T#1594439488" "STV_Working"
+7 0.0000000000000e+00 "P#1" "CT_Process" "C_Prog" "P#1"
+7 0.0000000000000e+00 "P#1_T#2572928832" "CT_Thread" "P#1" "P#1_T#2572928832"
+10 0.0000000000000e+00 "ST_Thread" "P#1_T#2572928832" "STV_Working"
+7 0.0000000000000e+00 "P#2" "CT_Process" "C_Prog" "P#2"
+7 0.0000000000000e+00 "P#2_T#1155401536" "CT_Thread" "P#2" "P#2_T#1155401536"
+10 0.0000000000000e+00 "ST_Thread" "P#2_T#1155401536" "STV_Working"
+7 0.0000000000000e+00 "P#3" "CT_Process" "C_Prog" "P#3"
+7 0.0000000000000e+00 "P#3_T#3632539456" "CT_Thread" "P#3" "P#3_T#3632539456"
+10 0.0000000000000e+00 "ST_Thread" "P#3_T#3632539456" "STV_Working"
+7 0.0000000000000e+00 "P#4" "CT_Process" "C_Prog" "P#4"
+7 0.0000000000000e+00 "P#4_T#199386944" "CT_Thread" "P#4" "P#4_T#199386944"
+10 0.0000000000000e+00 "ST_Thread" "P#4_T#199386944" "STV_Working"
+7 0.0000000000000e+00 "P#5" "CT_Process" "C_Prog" "P#5"
+7 0.0000000000000e+00 "P#5_T#2247067456" "CT_Thread" "P#5" "P#5_T#2247067456"
+10 0.0000000000000e+00 "ST_Thread" "P#5_T#2247067456" "STV_Working"
+7 0.0000000000000e+00 "P#6" "CT_Process" "C_Prog" "P#6"
+7 0.0000000000000e+00 "P#6_T#1522931520" "CT_Thread" "P#6" "P#6_T#1522931520"
+10 0.0000000000000e+00 "ST_Thread" "P#6_T#1522931520" "STV_Working"
+7 0.0000000000000e+00 "P#7" "CT_Process" "C_Prog" "P#7"
+7 0.0000000000000e+00 "P#7_T#1718773568" "CT_Thread" "P#7" "P#7_T#1718773568"
+10 0.0000000000000e+00 "ST_Thread" "P#7_T#1718773568" "STV_Working"
+11 3.7418194000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 7.8288417000000e+01 "ST_Thread" "P#5_T#2247067456" "STV_MPI_Send"
+40 7.8288417000000e+01 "L_MPI_P2P" "C_Prog" "P#5_T#2247067456" "src=5, dest=0, len=3000000, tag=4" "5_0_                   4_0x175e5f8"
+11 9.0118648000000e+01 "ST_Thread" "P#3_T#3632539456" "STV_MPI_Send"
+40 9.0118648000000e+01 "L_MPI_P2P" "C_Prog" "P#3_T#3632539456" "src=3, dest=0, len=3000000, tag=2" "3_0_                   2_0x175e680"
+11 9.1742126000000e+01 "ST_Thread" "P#6_T#1522931520" "STV_MPI_Send"
+40 9.1742126000000e+01 "L_MPI_P2P" "C_Prog" "P#6_T#1522931520" "src=6, dest=0, len=3000000, tag=5" "6_0_                   5_0x175e708"
+11 9.1968529000000e+01 "ST_Thread" "P#1_T#2572928832" "STV_MPI_Send"
+40 9.1968529000000e+01 "L_MPI_P2P" "C_Prog" "P#1_T#2572928832" "src=1, dest=0, len=3000000, tag=0" "1_0_                   0_0x175e570"
+12 9.2447709000000e+01 "ST_Thread" "P#1_T#2572928832"
+41 9.2463537000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=1, dest=0, len=3000000, tag=0" "1_0_                   0_0x175e570"
+12 9.2463537000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.2465516000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 9.4948739000000e+01 "ST_Thread" "P#2_T#1155401536" "STV_MPI_Send"
+40 9.4948739000000e+01 "L_MPI_P2P" "C_Prog" "P#2_T#1155401536" "src=2, dest=0, len=3000000, tag=1" "2_0_                   1_0x175e790"
+12 9.5437258000000e+01 "ST_Thread" "P#2_T#1155401536"
+41 9.5437546000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=2, dest=0, len=3000000, tag=1" "2_0_                   1_0x175e790"
+12 9.5437546000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.5439267000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+12 9.6336014000000e+01 "ST_Thread" "P#3_T#3632539456"
+41 9.6340187000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=3, dest=0, len=3000000, tag=2" "3_0_                   2_0x175e680"
+12 9.6340187000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.6341894000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 9.6696470000000e+01 "ST_Thread" "P#4_T#199386944" "STV_MPI_Send"
+40 9.6696470000000e+01 "L_MPI_P2P" "C_Prog" "P#4_T#199386944" "src=4, dest=0, len=3000000, tag=3" "4_0_                   3_0x175e818"
+41 9.7214325000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=4, dest=0, len=3000000, tag=3" "4_0_                   3_0x175e818"
+12 9.7214325000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.7215505000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+12 9.7218497000000e+01 "ST_Thread" "P#4_T#199386944"
+12 9.7648140000000e+01 "ST_Thread" "P#5_T#2247067456"
+41 9.7658552000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=5, dest=0, len=3000000, tag=4" "5_0_                   4_0x175e5f8"
+12 9.7658552000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.7660467000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+12 9.8070642000000e+01 "ST_Thread" "P#6_T#1522931520"
+41 9.8073743000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=6, dest=0, len=3000000, tag=5" "6_0_                   5_0x175e708"
+12 9.8073743000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.8074983000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 9.8948038000000e+01 "ST_Thread" "P#7_T#1718773568" "STV_MPI_Send"
+40 9.8948038000000e+01 "L_MPI_P2P" "C_Prog" "P#7_T#1718773568" "src=7, dest=0, len=3000000, tag=6" "7_0_                   6_0x175e8a0"
+12 9.9631852000000e+01 "ST_Thread" "P#7_T#1718773568"
+41 9.9640147000000e+01 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=7, dest=0, len=3000000, tag=6" "7_0_                   6_0x175e8a0"
+12 9.9640147000000e+01 "ST_Thread" "P#0_T#1594439488"
+11 9.9641331000000e+01 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 1.2463846200000e+02 "ST_Thread" "P#1_T#2572928832" "STV_MPI_Send"
+40 1.2463846200000e+02 "L_MPI_P2P" "C_Prog" "P#1_T#2572928832" "src=1, dest=0, len=3000000, tag=7" "1_0_                   7_0x175e928"
+12 1.2501822400000e+02 "ST_Thread" "P#1_T#2572928832"
+41 1.2503615900000e+02 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=1, dest=0, len=3000000, tag=7" "1_0_                   7_0x175e928"
+12 1.2503615900000e+02 "ST_Thread" "P#0_T#1594439488"
+11 1.2503772800000e+02 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 1.2590280600000e+02 "ST_Thread" "P#2_T#1155401536" "STV_MPI_Send"
+40 1.2590280600000e+02 "L_MPI_P2P" "C_Prog" "P#2_T#1155401536" "src=2, dest=0, len=3000000, tag=8" "2_0_                   8_0x175e9b0"
+12 1.2632598200000e+02 "ST_Thread" "P#2_T#1155401536"
+41 1.2633381800000e+02 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=2, dest=0, len=3000000, tag=8" "2_0_                   8_0x175e9b0"
+12 1.2633381800000e+02 "ST_Thread" "P#0_T#1594439488"
+11 1.2633517600000e+02 "ST_Thread" "P#0_T#1594439488" "STV_MPI_Recv"
+11 1.2685869700000e+02 "ST_Thread" "P#3_T#3632539456" "STV_MPI_Send"
+40 1.2685869700000e+02 "L_MPI_P2P" "C_Prog" "P#3_T#3632539456" "src=3, dest=0, len=3000000, tag=9" "3_0_                   9_0x175ea38"
+12 1.2724810800000e+02 "ST_Thread" "P#3_T#3632539456"
+41 1.2726238500000e+02 "L_MPI_P2P" "C_Prog" "P#0_T#1594439488" "src=3, dest=0, len=3000000, tag=9" "3_0_                   9_0x175ea38"
+12 1.2726238500000e+02 "ST_Thread" "P#0_T#1594439488"
+11 2.7399165800000e+02 "ST_Thread" "P#7_T#1718773568" "STV_Blocked"
+7 2.7399329300000e+02 "P#7_T#1640023808" "CT_Thread" "P#7" "P#7_T#1640023808"
+10 2.7399329300000e+02 "ST_Thread" "P#7_T#1640023808" "STV_Working"
+8 2.7399329300000e+02 "P#7_T#1640023808" "CT_Thread"
+12 2.7403579500000e+02 "ST_Thread" "P#7_T#1718773568"
+7 2.7409987500000e+02 "P#4_T#120637184" "CT_Thread" "P#4" "P#4_T#120637184"
+10 2.7409987500000e+02 "ST_Thread" "P#4_T#120637184" "STV_Working"
+8 2.7409987500000e+02 "P#4_T#120637184" "CT_Thread"
+7 2.7411353000000e+02 "P#6_T#1444181760" "CT_Thread" "P#6" "P#6_T#1444181760"
+10 2.7411353000000e+02 "ST_Thread" "P#6_T#1444181760" "STV_Working"
+8 2.7411353000000e+02 "P#6_T#1444181760" "CT_Thread"
+7 2.7411435600000e+02 "P#7_T#1543501568" "CT_Thread" "P#7" "P#7_T#1543501568"
+10 2.7411435600000e+02 "ST_Thread" "P#7_T#1543501568" "STV_Working"
+8 2.7411435600000e+02 "P#7_T#1543501568" "CT_Thread"
+7 2.7412114100000e+02 "P#3_T#3553789696" "CT_Thread" "P#3" "P#3_T#3553789696"
+10 2.7412114100000e+02 "ST_Thread" "P#3_T#3553789696" "STV_Working"
+8 2.7412114100000e+02 "P#3_T#3553789696" "CT_Thread"
+11 2.7412914800000e+02 "ST_Thread" "P#4_T#199386944" "STV_Blocked"
+12 2.7413419000000e+02 "ST_Thread" "P#4_T#199386944"
+11 2.7413657200000e+02 "ST_Thread" "P#6_T#1522931520" "STV_Blocked"
+12 2.7414038400000e+02 "ST_Thread" "P#6_T#1522931520"
+11 2.7414502100000e+02 "ST_Thread" "P#3_T#3632539456" "STV_Blocked"
+12 2.7414903300000e+02 "ST_Thread" "P#3_T#3632539456"
+11 2.7418488300000e+02 "ST_Thread" "P#2_T#1155401536" "STV_Blocked"
+7 2.7418804600000e+02 "P#2_T#1076651776" "CT_Thread" "P#2" "P#2_T#1076651776"
+10 2.7418804600000e+02 "ST_Thread" "P#2_T#1076651776" "STV_Working"
+8 2.7418804600000e+02 "P#2_T#1076651776" "CT_Thread"
+11 2.7421043200000e+02 "ST_Thread" "P#4_T#199386944" "STV_Blocked"
+12 2.7421221000000e+02 "ST_Thread" "P#2_T#1155401536"
+7 2.7422510900000e+02 "P#4_T#95463168" "CT_Thread" "P#4" "P#4_T#95463168"
+10 2.7422510900000e+02 "ST_Thread" "P#4_T#95463168" "STV_Working"
+8 2.7422510900000e+02 "P#4_T#95463168" "CT_Thread"
+7 2.7422798900000e+02 "P#6_T#1419007744" "CT_Thread" "P#6" "P#6_T#1419007744"
+10 2.7422798900000e+02 "ST_Thread" "P#6_T#1419007744" "STV_Working"
+8 2.7422798900000e+02 "P#6_T#1419007744" "CT_Thread"
+12 2.7423502000000e+02 "ST_Thread" "P#4_T#199386944"
+7 2.7423610600000e+02 "P#3_T#3528615680" "CT_Thread" "P#3" "P#3_T#3528615680"
+10 2.7423610600000e+02 "ST_Thread" "P#3_T#3528615680" "STV_Working"
+8 2.7423610600000e+02 "P#3_T#3528615680" "CT_Thread"
+11 2.7424321600000e+02 "ST_Thread" "P#6_T#1522931520" "STV_Blocked"
+12 2.7424449200000e+02 "ST_Thread" "P#6_T#1522931520"
+11 2.7425007100000e+02 "ST_Thread" "P#3_T#3632539456" "STV_Blocked"
+12 2.7425132700000e+02 "ST_Thread" "P#3_T#3632539456"
+11 2.7429576500000e+02 "ST_Thread" "P#2_T#1155401536" "STV_Blocked"
+7 2.7430123300000e+02 "P#2_T#1051477760" "CT_Thread" "P#2" "P#2_T#1051477760"
+10 2.7430123300000e+02 "ST_Thread" "P#2_T#1051477760" "STV_Working"
+8 2.7430123300000e+02 "P#2_T#1051477760" "CT_Thread"
+7 2.7430395800000e+02 "P#5_T#2168317696" "CT_Thread" "P#5" "P#5_T#2168317696"
+10 2.7430395800000e+02 "ST_Thread" "P#5_T#2168317696" "STV_Working"
+8 2.7430395800000e+02 "P#5_T#2168317696" "CT_Thread"
+11 2.7431299800000e+02 "ST_Thread" "P#7_T#1718773568" "STV_Blocked"
+12 2.7431480900000e+02 "ST_Thread" "P#7_T#1718773568"
+12 2.7432126200000e+02 "ST_Thread" "P#2_T#1155401536"
+11 2.7432680800000e+02 "ST_Thread" "P#5_T#2247067456" "STV_Blocked"
+12 2.7433119800000e+02 "ST_Thread" "P#5_T#2247067456"
+11 2.7440168500000e+02 "ST_Thread" "P#5_T#2247067456" "STV_Blocked"
+7 2.7440995500000e+02 "P#5_T#2159924992" "CT_Thread" "P#5" "P#5_T#2159924992"
+10 2.7440995500000e+02 "ST_Thread" "P#5_T#2159924992" "STV_Working"
+8 2.7440995500000e+02 "P#5_T#2159924992" "CT_Thread"
+12 2.7442359000000e+02 "ST_Thread" "P#5_T#2247067456"
+8 2.7466705000000e+02 "P#4_T#199386944" "CT_Thread"
+8 2.7474716600000e+02 "P#3_T#3632539456" "CT_Thread"
+8 2.7479607900000e+02 "P#6_T#1522931520" "CT_Thread"
+8 2.7482890000000e+02 "P#7_T#1718773568" "CT_Thread"
+8 2.7488375800000e+02 "P#2_T#1155401536" "CT_Thread"
+11 2.7494190900000e+02 "ST_Thread" "P#0_T#1594439488" "STV_Blocked"
+7 2.7494574100000e+02 "P#0_T#1515689728" "CT_Thread" "P#0" "P#0_T#1515689728"
+10 2.7494574100000e+02 "ST_Thread" "P#0_T#1515689728" "STV_Working"
+8 2.7494574100000e+02 "P#0_T#1515689728" "CT_Thread"
+12 2.7496610400000e+02 "ST_Thread" "P#0_T#1594439488"
+8 2.7497063200000e+02 "P#5_T#2247067456" "CT_Thread"
+11 2.7503748300000e+02 "ST_Thread" "P#0_T#1594439488" "STV_Blocked"
+7 2.7504392200000e+02 "P#0_T#1490515712" "CT_Thread" "P#0" "P#0_T#1490515712"
+10 2.7504392200000e+02 "ST_Thread" "P#0_T#1490515712" "STV_Working"
+8 2.7504392200000e+02 "P#0_T#1490515712" "CT_Thread"
+12 2.7505433500000e+02 "ST_Thread" "P#0_T#1594439488"
+8 2.7541007800000e+02 "P#0_T#1594439488" "CT_Thread"
+11 2.7543682000000e+02 "ST_Thread" "P#1_T#2572928832" "STV_Blocked"
+7 2.7543822700000e+02 "P#1_T#2494179072" "CT_Thread" "P#1" "P#1_T#2494179072"
+10 2.7543822700000e+02 "ST_Thread" "P#1_T#2494179072" "STV_Working"
+8 2.7543822700000e+02 "P#1_T#2494179072" "CT_Thread"
+12 2.7545525300000e+02 "ST_Thread" "P#1_T#2572928832"
+11 2.7550837200000e+02 "ST_Thread" "P#1_T#2572928832" "STV_Blocked"
+7 2.7551252900000e+02 "P#1_T#2399135488" "CT_Thread" "P#1" "P#1_T#2399135488"
+10 2.7551252900000e+02 "ST_Thread" "P#1_T#2399135488" "STV_Working"
+8 2.7551252900000e+02 "P#1_T#2399135488" "CT_Thread"
+12 2.7552391000000e+02 "ST_Thread" "P#1_T#2572928832"
+8 2.7591285400000e+02 "P#1_T#2572928832" "CT_Thread"
