@@ -838,6 +838,8 @@ animated_gif *load_image_seq(char *input_filename)
   printf("EXECUTION TIME:\n");
   printf("  LOADING:      %lf s\n", duration);
 #endif
+
+  return image;
 }
 
 void apply_filters_seq(animated_gif *image)
@@ -849,13 +851,12 @@ void apply_filters_seq(animated_gif *image)
 #endif
 
   /* Convert the pixels into grayscale */
-
-  apply_gray_filter(image);
+  apply_gray_filter( image );
 
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-  printf("  GRAY filter: %lf s\n\n", duration);
+  printf("  GRAY filter: %lf s\n", duration);
   gettimeofday(&t1, NULL);
 #endif
 
@@ -865,7 +866,7 @@ void apply_filters_seq(animated_gif *image)
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-  printf("  BLUR filter: %lf s\n\n", duration);
+  printf("  BLUR filter: %lf s\n", duration);
   gettimeofday(&t1, NULL);
 #endif
 
@@ -875,7 +876,7 @@ void apply_filters_seq(animated_gif *image)
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-  printf("  SOBEL filter: %lf s\n\n", duration);
+  printf("  SOBEL filter: %lf s\n", duration);
   gettimeofday(&t1, NULL);
 #endif
 }
@@ -910,7 +911,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
 #if DISPLAY_TIME
     gettimeofday(&t2, NULL);
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-    printf("  Paral filters: %lf s\n\n", duration);
+    printf("  Paral filters: %lf s\n", duration);
     gettimeofday(&t1, NULL);
 #endif
 
@@ -923,7 +924,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
 #if DISPLAY_TIME
     gettimeofday(&t2, NULL);
     duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-    printf("  Export:       %lf s\n\n", duration);
+    printf("  Export:       %lf s\n", duration);
 #endif
   }
 
@@ -979,7 +980,7 @@ int export_seq(char *output_filename, animated_gif *image)
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-  printf("  EXPORT: %lf s\n\n", duration);
+  printf("  EXPORT: %lf s\n", duration);
 #endif
 
   return 0;
@@ -1020,8 +1021,13 @@ int main(int argc, char **argv)
   }
   /* FILTERING: apply filters */
   /* Decision to be taken depending on the size, nb of images... */
-  apply_filters_seq(image);
-  export_seq(output_filename, image);
+
+  // SEQUENTIAL:
+  // apply_filters_seq( image );
+  // export_seq(output_filename, image);
+
+  // PARALLEL:
+  apply_filters_mpi( image, output_filename );
 
   MPI_Finalize();
   return 0;
