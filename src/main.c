@@ -913,11 +913,10 @@ void apply_filters_seq(animated_gif *image)
 #endif
 }
 
-int apply_filters_mpi(animated_gif *image, char *output_filename)
+int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
 {
   /* MPI stuff */
   int rank, n_process;
-  int root = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &n_process);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -952,7 +951,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
 
       if (node == root)
       {
-        printf("  Node %d working on image n°%d\n", rank, im);
+        printf("  Root %d working on image n°%d\n", rank, im);
         *width = image->width[im];
         *height = image->height[im];
         work_gif->width = width;
@@ -998,7 +997,13 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
   }
 
   else
+  /* Case node != root */
   {
+    int num_im_to_treat = (image->n_images - rank - 1) / n_process + 1;
+    MPI_Request *send_req = malloc( num_im_to_treat * sizeof(MPI_Request) );
+    //MPI_Request *req;
+
+
     for (im = rank; im < image->n_images; im += n_process)
     {
       /*  */
@@ -1018,8 +1023,10 @@ int apply_filters_mpi(animated_gif *image, char *output_filename)
       apply_sobel_filter(work_gif);
 
       // ---- Sending back to root ----
-      MPI_Send(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD);
+      MPI_Isend(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD, send_req++);
     }
+
+    //MPI_WaitAll
   }
 }
 
@@ -1052,10 +1059,10 @@ int main(int argc, char **argv)
 {
   /* MPI stuff */
   int rank, n_process;
-  int root = 0;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &n_process);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  int root = n_process - 1;
 
   char *input_filename;
   char *output_filename;
@@ -1086,7 +1093,7 @@ int main(int argc, char **argv)
 
     /* FILTERING: apply filters */
     /* Decision to be taken depending on the size, nb of images... */
-    apply_filters_mpi(image, output_filename);
+    apply_filters_mpi(image, output_filename, root);
   }
 
   /* Sequential */
