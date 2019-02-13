@@ -194,11 +194,6 @@ load_pixels(char *filename)
   return image;
 }
 
-animated_gif *
-get_parts(animated_gif *image, int n_process, int rank)
-{
-}
-
 int output_modified_read_gif(char *filename, GifFileType *g)
 {
   GifFileType *g2;
@@ -246,6 +241,12 @@ int store_pixels(char *filename, animated_gif *image)
   pixel **p;
   int i, j, k;
   GifColorType *colormap;
+
+  int print_time = 1;
+
+  struct timeval t1, t2;
+  double duration;
+  gettimeofday(&t1, NULL);
 
   /* Initialize the new set of colors */
   colormap = (GifColorType *)malloc(256 * sizeof(GifColorType));
@@ -451,6 +452,14 @@ int store_pixels(char *filename, animated_gif *image)
     }
   }
 
+  if (print_time)
+  {
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+    printf("  EXPORT init: %lf s\n", duration);
+    gettimeofday(&t1, NULL);
+  }
+
 #if SOBELF_DEBUG
   printf("[DEBUG] Number of colors after background and transparency: %d\n",
          n_colors);
@@ -529,6 +538,14 @@ int store_pixels(char *filename, animated_gif *image)
 
   image->g->SColorMap = cmo;
 
+  if (print_time)
+  {
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+    printf("  EXPORT numcolor: %lf s\n", duration);
+    gettimeofday(&t1, NULL);
+  }
+
   /* Update the raster bits according to color map */
   for (i = 0; i < image->n_images; i++)
   {
@@ -556,12 +573,27 @@ int store_pixels(char *filename, animated_gif *image)
     }
   }
 
+  if (print_time)
+  {
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+    printf("  EXPORT colormap: %lf s\n", duration);
+    gettimeofday(&t1, NULL);
+  }
+
   /* Write the final image */
   if (!output_modified_read_gif(filename, image->g))
   {
     return 0;
   }
 
+  if (print_time)
+  {
+    gettimeofday(&t2, NULL);
+    duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+    printf("  EXPORT exit: %lf s\n", duration);
+    gettimeofday(&t1, NULL);
+  }
   return 1;
 }
 
@@ -939,6 +971,10 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
   if (rank == root)
   {
     int node;
+    // arrays to store the receive requests and statuses for the MPI_Waitall
+    MPI_Request recv_req[n_process];
+    MPI_Status recv_sts[n_process];
+    int rec = 0;
 
     for (im = 0; im < image->n_images; im++)
     {
@@ -972,8 +1008,14 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
 
       else
       {
-        MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Irecv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, &recv_req[rec++]);
       }
+    }
+
+    if (n_process > 1)
+    {
+      // wait for all the requests to terminate
+      MPI_Waitall(rec, recv_req, MPI_STATUSES_IGNORE);
     }
 
 #if DISPLAY_TIME
@@ -1000,9 +1042,8 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
   /* Case node != root */
   {
     int num_im_to_treat = (image->n_images - rank - 1) / n_process + 1;
-    MPI_Request *send_req = malloc( num_im_to_treat * sizeof(MPI_Request) );
+    MPI_Request *send_req = malloc(num_im_to_treat * sizeof(MPI_Request));
     //MPI_Request *req;
-
 
     for (im = rank; im < image->n_images; im += n_process)
     {
@@ -1079,7 +1120,7 @@ int main(int argc, char **argv)
   input_filename = argv[1];
   output_filename = argv[2];
 
-  int mpi = 1;
+  int mpi = 0;
 
   /* Code paralellized with mpi */
   if (mpi)
