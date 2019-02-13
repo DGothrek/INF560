@@ -324,7 +324,6 @@ int store_pixels(char *filename, animated_gif *image)
                        image->g->SColorMap->Colors[tr_color].Blue,
                        moy, moy, moy);
 #endif
-
                 for (k = 0; k < n_colors; k++)
                 {
                     if (
@@ -531,27 +530,37 @@ int store_pixels(char *filename, animated_gif *image)
     /* Update the raster bits according to color map */
     for (i = 0; i < image->n_images; i++)
     {
-        for (j = 0; j < image->width[i] * image->height[i]; j++)
+        int width = image->width[i];
+        int incorrect_color = 0;
+#pragma omp parallel shared(image, p) private(j, k)
         {
-            int found_index = -1;
-            for (k = 0; k < n_colors; k++)
+#pragma omp for schedule(dynamic, width)
+            for (j = 0; j < width * image->height[i]; j++)
             {
-                if (p[i][j].r == image->g->SColorMap->Colors[k].Red &&
-                    p[i][j].g == image->g->SColorMap->Colors[k].Green &&
-                    p[i][j].b == image->g->SColorMap->Colors[k].Blue)
+                int found_index = -1;
+                for (k = 0; k < n_colors; k++)
                 {
-                    found_index = k;
+                    if (p[i][j].r == image->g->SColorMap->Colors[k].Red &&
+                        p[i][j].g == image->g->SColorMap->Colors[k].Green &&
+                        p[i][j].b == image->g->SColorMap->Colors[k].Blue)
+                    {
+                        found_index = k;
+                    }
                 }
-            }
 
-            if (found_index == -1)
-            {
-                fprintf(stderr,
-                        "Error: Unable to find a pixel in the color map\n");
-                return 0;
-            }
+                if (found_index == -1)
+                {
+                    incorrect_color = 1;
+                }
 
-            image->g->SavedImages[i].RasterBits[j] = found_index;
+                image->g->SavedImages[i].RasterBits[j] = found_index;
+            }
+        }
+        if (incorrect_color)
+        {
+            fprintf(stderr,
+                    "Error: Unable to find a pixel in the color map\n");
+            return 0;
         }
     }
 
@@ -572,7 +581,7 @@ void apply_gray_filter(animated_gif *image)
 #pragma omp parallel shared(p)
     {
         int i, j;
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
         for (i = 0; i < image->n_images; i++)
         {
             for (j = 0; j < image->width[i] * image->height[i]; j++)
@@ -650,7 +659,7 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
 /* Apply blur on top part of image (10%) */
 #pragma omp parallel shared(p, new) private(j, k)
             {
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
                 for (j = size; j < height / 10 - size; j++)
                 {
                     for (k = size; k < width - size; k++)
@@ -681,7 +690,7 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
 #pragma omp parallel shared(p, new) private(j, k) firstprivate(size)
             {
                 int test = height * 0.9 + size;
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
                 for (j = height / 10 - size; j < test; j++)
                 {
                     for (k = size; k < width - size; k++)
@@ -696,7 +705,7 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
 /* Apply blur on the bottom part of the image (10%) */
 #pragma omp parallel shared(p, new) private(j, k)
             {
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
                 for (j = height * 0.9 + size; j < height - size; j++)
                 {
                     for (k = size; k < width - size; k++)
@@ -724,7 +733,7 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
             }
 #pragma omp parallel shared(p, new) private(j, k)
             {
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
                 for (j = 1; j < height - 1; j++)
                 {
                     for (k = 1; k < width - 1; k++)
@@ -778,7 +787,7 @@ void apply_sobel_filter(animated_gif *image)
         sobel = (pixel *)malloc(width * height * sizeof(pixel));
 #pragma omp parallel shared(p, sobel)
         {
-#pragma omp for  schedule(dynamic)
+#pragma omp for schedule(dynamic)
             for (j = 1; j < height - 1; j++)
             {
                 for (k = 1; k < width - 1; k++)
@@ -926,7 +935,6 @@ int main(int argc, char **argv)
     total_duration += duration;
     printf("  EXPORT:       %lf s\n", duration);
     printf("  TOTAL:       %lf s\n\n", total_duration);
-
 
     return 0;
 }
