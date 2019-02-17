@@ -13,7 +13,7 @@ echo "Running test on $i -> $DEST"
 cd traces
 rm -f *
 
-salloc -N 1 -n 4 mpirun eztrace -t mpi ../sobelf $i $DEST
+OMP_NUM_THREADS=8 salloc -N 1 -n 1 mpirun eztrace -t mpi ../sobelf $i $DEST
 
 eztrace_convert ${USER}_eztrace_log_rank_*
 
