@@ -15,7 +15,7 @@
 
 #define SOBELF_DEBUG 0
 #define DISPLAY_TIME 1
-#define DISPLAY_TIME_DETAILED 1
+#define DISPLAY_TIME_DETAILED 0
 
 /* Represent one pixel from the image */
 typedef struct pixel
@@ -1108,6 +1108,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
             MPI_Isend(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD, send_req++);
         }
 
+        // TODO
         //MPI_WaitAll
     }
 }
@@ -1170,7 +1171,7 @@ int main(int argc, char **argv)
     input_filename = argv[1];
     output_filename = argv[2];
 
-    int mpi = 0;
+    int mpi = 1;
 
     /* Code paralellized with mpi */
     if (mpi)
