@@ -664,6 +664,53 @@ void apply_gray_filter(animated_gif *image)
     }
 }
 
+void apply_gray_filter_mpi(animated_gif *image, int n_cut, int root)
+{
+    int n_process, rank;
+    int i, j, pos;
+    pixel **p;
+
+    MPI_Comm_size(MPI_COMM_WORLD, &n_process);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    p = image->p;
+
+    for (i = rank; i < image->n_images * n_cuts; i += n_process)
+    {
+        int portion = i % n_cuts;
+        int image_n = (i - portion) / n_cuts;
+        int work_width = image->width[image_n] / n_cuts;
+        int start_column = portion * work_width;
+        int end_column = (portion + 1) * work_width;
+
+        // Delegate the remaining columns to the same node
+        if (portion + 1 = n_cuts)
+        {
+            end_column = image->width[image_n];
+        }
+
+        for (j = 0; j < image->height[image_n]; j++)
+        {
+            for (pos = (j * image->width[image_n]) + start_column; pos < (j * image->width[image_n]) + end_column; pos++)
+            {
+                int moy;
+
+                // moy = p[i][pos].r/4 + ( p[i][pos].g * 3/4 ) ;
+                moy = (p[i][pos].r + p[i][pos].g + p[i][pos].b) / 3;
+                if (moy < 0)
+                    moy = 0;
+                if (moy > 255)
+                    moy = 255;
+
+                p[i][pos].r = moy;
+                p[i][pos].g = moy;
+                p[i][pos].b = moy;
+            }
+        }
+    }
+    MPI_Send()
+}
+
 #define CONV(l, c, nb_c) \
     (l) * (nb_c) + (c)
 
@@ -1009,32 +1056,89 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
     gettimeofday(&t1, NULL);
 #endif
 
-    // an animated_gif is created, with 1 image, to apply filters on it
-    animated_gif *work_gif = (animated_gif *)malloc(sizeof(animated_gif));
-    work_gif->n_images = 1;
-    work_gif->g = image->g;
-    int *width = (int *)malloc(sizeof(int));
-    int *height = (int *)malloc(sizeof(int));
-    pixel **new_p = malloc(1 * sizeof(pixel *));
-
-    int im, im_size;
-
-    if (rank == root)
+    if (image->n_images > n_process)
     {
-        int node;
+        // an animated_gif is created, with 1 image, to apply filters on it
+        animated_gif *work_gif = (animated_gif *)malloc(sizeof(animated_gif));
+        work_gif->n_images = 1;
+        work_gif->g = image->g;
+        int *width = (int *)malloc(sizeof(int));
+        int *height = (int *)malloc(sizeof(int));
+        pixel **new_p = malloc(1 * sizeof(pixel *));
 
-        for (im = 0; im < image->n_images; im++)
+        int im, im_size;
+
+        if (rank == root)
         {
-            im_size = image->width[im] * image->height[im] * sizeof(pixel);
+            int node;
 
-            node = im % n_process;
+            for (im = 0; im < image->n_images; im++)
+            {
+                im_size = image->width[im] * image->height[im] * sizeof(pixel);
 
-            /** If node is root, work on the image. 
+                node = im % n_process;
+
+                /** If node is root, work on the image. 
           Else, receive the image from the node */
 
-            if (node == root)
+                if (node == root)
+                {
+                    printf("  Root %d working on image n°%d\n", rank, im);
+                    *width = image->width[im];
+                    *height = image->height[im];
+                    work_gif->width = width;
+                    work_gif->height = height;
+
+                    im_size = (*width) * (*height) * sizeof(pixel);
+                    new_p[0] = image->p[im];
+                    work_gif->p = new_p;
+
+                    /* Convert the pixels into grayscale */
+                    apply_gray_filter(work_gif);
+                    apply_blur_filter(work_gif, 5, 20);
+                    apply_sobel_filter(work_gif);
+
+                    /* Copy work_gif into the image */
+                    memcpy(image->p[im], work_gif->p[0], im_size);
+                }
+
+                else
+                {
+                    MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                }
+            }
+
+#if DISPLAY_TIME
+            gettimeofday(&t2, NULL);
+            duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+            printf("  Paral filters: %lf s\n", duration);
+            gettimeofday(&t1, NULL);
+#endif
+
+            /* Store file from array of pixels to GIF file */
+            if (!store_pixels(output_filename, image))
             {
-                printf("  Root %d working on image n°%d\n", rank, im);
+                return 1;
+            }
+
+#if DISPLAY_TIME
+            gettimeofday(&t2, NULL);
+            duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+            printf("  Export:       %lf s\n", duration);
+#endif
+        }
+
+        else
+        /* Case node != root */
+        {
+            int num_im_to_treat = (image->n_images - rank - 1) / n_process + 1;
+            MPI_Request *send_req = malloc(num_im_to_treat * sizeof(MPI_Request));
+            //MPI_Request *req;
+
+            for (im = rank; im < image->n_images; im += n_process)
+            {
+                /*  */
+                printf("  Node %d working on image n°%d\n", rank, im);
                 *width = image->width[im];
                 *height = image->height[im];
                 work_gif->width = width;
@@ -1049,67 +1153,36 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
                 apply_blur_filter(work_gif, 5, 20);
                 apply_sobel_filter(work_gif);
 
-                /* Copy work_gif into the image */
-                memcpy(image->p[im], work_gif->p[0], im_size);
+                // ---- Sending back to root ----
+                MPI_Isend(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD, send_req++);
             }
 
-            else
-            {
-                MPI_Recv(image->p[im], im_size, MPI_BYTE, node, im, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            }
+            // TODO
+            //MPI_WaitAll
         }
-
-#if DISPLAY_TIME
-        gettimeofday(&t2, NULL);
-        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-        printf("  Paral filters: %lf s\n", duration);
-        gettimeofday(&t1, NULL);
-#endif
-
-        /* Store file from array of pixels to GIF file */
-        if (!store_pixels(output_filename, image))
-        {
-            return 1;
-        }
-
-#if DISPLAY_TIME
-        gettimeofday(&t2, NULL);
-        duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-        printf("  Export:       %lf s\n", duration);
-#endif
     }
-
+    /* There are no good repartitions just considering the images inside a GIF,
+     * we should cut each image to have a better repartition.
+    */
     else
-    /* Case node != root */
     {
-        int num_im_to_treat = (image->n_images - rank - 1) / n_process + 1;
-        MPI_Request *send_req = malloc(num_im_to_treat * sizeof(MPI_Request));
-        //MPI_Request *req;
-
-        for (im = rank; im < image->n_images; im += n_process)
+        int n_images = image->n_images;
+        //Find cut
+        int n_cut = 1;
+        // Ensures that we cannot cut more than the number of lines
+        while ((n_images * n_cut < n_process) && (n_cut < image->width[0]))
         {
-            /*  */
-            printf("  Node %d working on image n°%d\n", rank, im);
-            *width = image->width[im];
-            *height = image->height[im];
-            work_gif->width = width;
-            work_gif->height = height;
-
-            im_size = (*width) * (*height) * sizeof(pixel);
-            new_p[0] = image->p[im];
-            work_gif->p = new_p;
-
-            /* Convert the pixels into grayscale */
-            apply_gray_filter(work_gif);
-            apply_blur_filter(work_gif, 5, 20);
-            apply_sobel_filter(work_gif);
-
-            // ---- Sending back to root ----
-            MPI_Isend(work_gif->p[0], im_size, MPI_BYTE, root, im, MPI_COMM_WORLD, send_req++);
+            n_cut++;
         }
 
-        // TODO
-        //MPI_WaitAll
+        /* We thus need to cut each image n_cut times,
+         * and to apply each filter to part of the image.
+         * We must make sure, for sobel filter and blur filter,
+         * that the information in correctly shared between the nodes 
+        */
+        apply_gray_filter_mpi(image, n_cut, root);
+        apply_blur_filter_mpi(image, n_cut, root, 5, 20);
+        apply_sobel_filter_mpi(image, n_cut, root);
     }
 }
 
