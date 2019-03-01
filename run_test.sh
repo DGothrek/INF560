@@ -3,7 +3,7 @@
 make
 
 INPUT_DIR=images/original
-OUTPUT_DIR=images/processed
+OUTPUT_DIR=images/processed_ref
 mkdir $OUTPUT_DIR 2>/dev/null
 
 for i in $INPUT_DIR/*gif ; do

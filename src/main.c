@@ -1171,7 +1171,7 @@ int main(int argc, char **argv)
     input_filename = argv[1];
     output_filename = argv[2];
 
-    int mpi = 1;
+    int mpi = 0;
 
     /* Code paralellized with mpi */
     if (mpi)
