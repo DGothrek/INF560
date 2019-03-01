@@ -1,3 +1,7 @@
+/** 
+ * Compare two image files byte by byte.
+ * */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,7 +32,7 @@ int compare(char *filename1, char *filename2) {
         printf("Les fichiers n'ont pas la même taille\n");
         return 0;
     }
-    
+
     do
     {
         carac1 = fgetc(f1); // On lit le caractère
