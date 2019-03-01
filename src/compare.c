@@ -14,7 +14,7 @@ int compare(char *filename1, char *filename2) {
     f2 = fopen(filename2, "rb");
     if (f1 == NULL || f2 == NULL)
     {
-        fprintf(stderr, "Error opening file");
+        fprintf(stderr, "Error opening file\n");
         return 0;
     }
 
@@ -26,10 +26,10 @@ int compare(char *filename1, char *filename2) {
     fseek(f1, 0, SEEK_SET);
     fseek(f2, 0, SEEK_SET);
 
-    printf("Size of file1 = %ld\nSize of file2 = %ld\n", size1, size2);
+    //printf("Size of file1 = %ld\nSize of file2 = %ld\n", size1, size2);
 
     if (size1 != size2) {
-        printf("Les fichiers n'ont pas la même taille\n");
+        printf("Les fichiers n'ont pas la même taille\nSize1 = %d, Size2 = %d\n", size1, size2);
         return 0;
     }
 
