@@ -1,4 +1,7 @@
-all: hello_cpu add_vectors
+all: hello_cpu add_vectors main
+
+main: main.c
+	gcc -o main main.c
 
 hello_cpu: hello_cpu.cu
 	nvcc -I. -o hello_cpu hello_cpu.cu
