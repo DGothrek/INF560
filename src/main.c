@@ -888,8 +888,6 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
             }
         } while (threshold > 0 && !end);
 
-        printf("Nb iter for image %d\n", n_iter);
-
         free(new);
     }
 }
@@ -984,10 +982,10 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
                 if (id % n_process == rank)
                 {
-                    // #pragma omp parallel shared(p, new, size, height, i, width, threshold, end) private(k) default(none)
+// #pragma omp parallel shared(p, new, size, height, i, width, threshold, end, id) private(k) default(none)
                     {
-                        /* Apply blur on top part of image (10%) */
-                        // #pragma omp for schedule(dynamic)
+/* Apply blur on top part of image (10%) */
+// #pragma omp for schedule(dynamic)
                         for (j = size; j < height / 10 - size; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1015,7 +1013,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
                         /* Copy the middle part of the image */
                         int limit = height * 0.9 + size;
-                        // #pragma omp for schedule(dynamic)
+// #pragma omp for schedule(dynamic)
                         for (j = height / 10 - size; j < limit; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1026,8 +1024,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                             }
                         }
 
-                        /* Apply blur on the bottom part of the image (10%) */
-                        // #pragma omp for schedule(dynamic)
+/* Apply blur on the bottom part of the image (10%) */
+// #pragma omp for schedule(dynamic)
                         for (j = height * 0.9 + size; j < height - size; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1053,8 +1051,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                             }
                         }
 
-                        // #pragma omp for schedule(dynamic)
-                        // Check if need to stop.
+// Check if need to stop.
+// #pragma omp for schedule(dynamic)
                         for (j = 1; j < height - 1; j++)
                         {
                             for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
@@ -1072,7 +1070,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                                     diff_g > threshold || -diff_g > threshold ||
                                     diff_b > threshold || -diff_b > threshold)
                                 {
-                                    // #pragma omp atom
+// #pragma omp atom
                                     end = 0;
                                 }
 
@@ -1136,7 +1134,9 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
             // Because root already has the information it processed.
             if (rank == root && id % n_process != root)
             {
-                printf("Recieving portion %d from rank %d", portion, id % n_process);
+#if SOBELF_DEBUG
+                printf("Recieving portion %d from rank %d\n", portion, id % n_process);
+#endif
                 MPI_Irecv(p[image_n] + start_column, 1, columnstype,
                           id % n_process, id, MPI_COMM_WORLD, &recv_request);
             }
@@ -1238,10 +1238,9 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
     for (i = 0; i < image->n_images * n_cut; i++)
     {
         pixel *sobel;
-        sobel = (pixel *)malloc(width * height * sizeof(pixel));
+
         if (i % n_process == rank)
         {
-
             int portion = i % n_cut;
             int image_n = (i - portion) / n_cut;
             // printf("Processing portion %d of image %d with rank %d.\n", portion, image_n, rank);
@@ -1254,8 +1253,9 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
             {
                 end_column = image->width[image_n];
             }
-            width = image->width[i];
-            height = image->height[i];
+            width = image->width[image_n];
+            height = image->height[image_n];
+            sobel = (pixel *)malloc(width * height * sizeof(pixel));
 
             // #pragma omp parallel shared(sobel, p, width, height, i) default(none)
             {
@@ -1273,15 +1273,15 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
                         float deltaY_blue;
                         float val_blue;
 
-                        pixel_blue_no = p[i][CONV(j - 1, k - 1, width)].b;
-                        pixel_blue_n = p[i][CONV(j - 1, k, width)].b;
-                        pixel_blue_ne = p[i][CONV(j - 1, k + 1, width)].b;
-                        pixel_blue_so = p[i][CONV(j + 1, k - 1, width)].b;
-                        pixel_blue_s = p[i][CONV(j + 1, k, width)].b;
-                        pixel_blue_se = p[i][CONV(j + 1, k + 1, width)].b;
-                        pixel_blue_o = p[i][CONV(j, k - 1, width)].b;
-                        pixel_blue = p[i][CONV(j, k, width)].b;
-                        pixel_blue_e = p[i][CONV(j, k + 1, width)].b;
+                        pixel_blue_no = p[image_n][CONV(j - 1, k - 1, width)].b;
+                        pixel_blue_n = p[image_n][CONV(j - 1, k, width)].b;
+                        pixel_blue_ne = p[image_n][CONV(j - 1, k + 1, width)].b;
+                        pixel_blue_so = p[image_n][CONV(j + 1, k - 1, width)].b;
+                        pixel_blue_s = p[image_n][CONV(j + 1, k, width)].b;
+                        pixel_blue_se = p[image_n][CONV(j + 1, k + 1, width)].b;
+                        pixel_blue_o = p[image_n][CONV(j, k - 1, width)].b;
+                        pixel_blue = p[image_n][CONV(j, k, width)].b;
+                        pixel_blue_e = p[image_n][CONV(j, k + 1, width)].b;
 
                         deltaX_blue = -pixel_blue_no + pixel_blue_ne - 2 * pixel_blue_o + 2 * pixel_blue_e - pixel_blue_so + pixel_blue_se;
 
@@ -1307,24 +1307,27 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
                 // #pragma omp for schedule(dynamic)
                 for (j = 1; j < height - 1; j++)
                 {
-                    for (k = 1; k < width - 1; k++)
+                    for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
                     {
-                        p[i][CONV(j, k, width)].r = sobel[CONV(j, k, width)].r;
-                        p[i][CONV(j, k, width)].g = sobel[CONV(j, k, width)].g;
-                        p[i][CONV(j, k, width)].b = sobel[CONV(j, k, width)].b;
+                        p[image_n][CONV(j, k, width)].r = sobel[CONV(j, k, width)].r;
+                        p[image_n][CONV(j, k, width)].g = sobel[CONV(j, k, width)].g;
+                        p[image_n][CONV(j, k, width)].b = sobel[CONV(j, k, width)].b;
                     }
                 }
             }
+            free(sobel);
         }
-        free(sobel);
     }
-    
+
+    /*
+     * Then send all the data back to root for exporting.
+     */
     int id, portion, image_n, work_width, start_column, end_column;
 
     for (id = 0; id < image->n_images * n_cut; id++)
     {
         portion = id % n_cut;
-        image_n = (id-portion) / n_cut;
+        image_n = (id - portion) / n_cut;
         work_width = image->width[image_n] / n_cut;
         start_column = portion * work_width;
         end_column = (portion + 1) * work_width;
@@ -1353,9 +1356,11 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
         // Because root already has the information it processed.
         if (rank == root && id % n_process != root)
         {
+#if SOBELF_DEBUG
             printf("Recieving portion %d from rank %d", portion, id % n_process);
+#endif
             MPI_Recv(p[image_n] + start_column, 1, columnstype,
-                      id % n_process, id, MPI_COMM_WORLD, &status);
+                     id % n_process, id, MPI_COMM_WORLD, &status);
         }
         MPI_Type_free(&columnstype);
     }
@@ -1599,12 +1604,9 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
          * We must make sure, for sobel filter and blur filter,
          * that the information in correctly shared between the nodes 
         */
-        apply_gray_filter(image);
-        apply_blur_filter(image, blur_size, 20);
+        apply_gray_filter_mpi(image, n_cut, root);
+        apply_blur_filter_mpi(image, n_cut, root, blur_size, 20);
         apply_sobel_filter_mpi(image, n_cut, root);
-        // apply_gray_filter_mpi(image, n_cut, root);
-        // apply_blur_filter_mpi(image, n_cut, root, blur_size, 20);
-        // apply_sobel_filter_mpi(image, n_cut, root);
 
         if (rank == root)
         {
