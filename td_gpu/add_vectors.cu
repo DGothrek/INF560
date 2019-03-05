@@ -20,7 +20,6 @@ void vector_add(int *c, int *a, int *b, int length)
 {
   int *d_a, *d_b, *d_c;
   struct timeval t1, t2;
-  
 
   cudaMalloc(&d_a, length * sizeof(int));
   cudaMalloc(&d_b, length * sizeof(int));
@@ -35,8 +34,8 @@ void vector_add(int *c, int *a, int *b, int length)
   printf("Transfer done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
   gettimeofday(&t1, NULL);
 
-
-  dim3 dimGrid(length/1024+1);
+  // a (1D/2D/3D) grid containing blocks, each one containing threads.
+  dim3 dimGrid(length / 1024 + 1);
   dim3 dimBlock(1024);
   vectAdd<<<dimGrid, dimBlock>>>(d_a, d_b, d_c, length);
 
