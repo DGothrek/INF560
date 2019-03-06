@@ -10,7 +10,7 @@ PKG_CONFIG_PATH=$HWLOC_ROOT/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # CUDA stuff
 export CUDA_ROOT=/usr/local/cuda
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_ROOT}/lib/
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_ROOT}/lib/:${CUDA_ROOT}/lib64/
 PATH=${CUDA_ROOT}/bin/:${CUDA_ROOT}/open64/bin/:$PATH
 
 # MPI stuff
