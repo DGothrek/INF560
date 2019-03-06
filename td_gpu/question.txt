@@ -1,0 +1,8 @@
+- Comment inclure du code cuda dans main.c ? (headers, compilos, ...)
+- Comment obtenir les caracs du gpu ? En incluant les fichiers du dernier TD dans notre projet ?
+- Rééxpliquer grid et blocks, maximum 1024 dans dimBlock() ? Maximum aussi sur le nb de blocks ?
+- Accéder au pixel nord-est etc. ?
+- Montrer sur l'ordi l'infratructure du gpu programming ...
+
+
+MPI+CUDA :
