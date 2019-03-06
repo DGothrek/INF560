@@ -1,14 +1,12 @@
-all: hello_cpu add_vectors main
 
-main: main.c
-	gcc -o main main.c
+all:bandwidthTest deviceQuery
 
-hello_cpu: hello_cpu.cu
-	nvcc -I. -o hello_cpu hello_cpu.cu
+bandwidthTest:bandwidthTest.cu
+	nvcc -I. -o bandwidthTest bandwidthTest.cu
 
-add_vectors: add_vectors.cu
-	nvcc -I. -o add_vectors add_vectors.cu
+deviceQuery: deviceQuery.cpp
+	nvcc -I. -o deviceQuery deviceQuery.cpp 
+
 
 clean:
-	rm -f hello_cpu add_vectors
- 
+	rm -f bandwidthTest deviceQuery
