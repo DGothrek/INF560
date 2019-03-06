@@ -894,7 +894,7 @@ void apply_blur_filter(animated_gif *image, int size, int threshold)
 
 void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, int threshold)
 {
-    int n_process, rank;
+    int n_process, rank, n_request;
 
     int i, j, k, id;
     int width, height;
@@ -928,6 +928,30 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
             end_root = 1;
             n_iter++;
 
+            n_request = 0;
+
+            for (id = i * n_cut; id < (i + 1) * n_cut; id++)
+            {
+                int portion = id % n_cut;
+                int image_n = i;
+                if (id % n_process == rank)
+                {
+                    if (portion != 0 && portion != n_cut - 1)
+                    {
+                        n_request += 2;
+                    }
+                    else
+                    {
+                        n_request++;
+                    }
+                }
+            }
+            MPI_Request *send_request;
+            MPI_Status *status;
+
+            send_request = (MPI_Request *)malloc(n_request * sizeof(MPI_Request));
+            int counter = 0;
+
             for (id = i * n_cut; id < (i + 1) * n_cut; id++)
             {
                 int portion = id % n_cut;
@@ -941,7 +965,6 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
                 // Send the data to the adjacent columns that need it to process.
 
-                MPI_Request send_request;
                 MPI_Datatype columnstype;
                 MPI_Status recv_status;
 
@@ -958,12 +981,14 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                     {
                         // Send to the node before so that it can use the correct information to update its blur.
                         MPI_Isend(p[image_n] + start_column, 1, columnstype,
-                                  (rank - 1) % n_process, 2 * id, MPI_COMM_WORLD, &send_request);
+                                  (rank - 1) % n_process, 2 * id, MPI_COMM_WORLD, send_request++);
+                        counter++;
                     }
                     if (portion != n_cut - 1)
                     {
                         MPI_Isend(p[image_n] + (end_column - blur_size), 1, columnstype,
-                                  (rank + 1) % n_process, 2 * id + 1, MPI_COMM_WORLD, &send_request);
+                                  (rank + 1) % n_process, 2 * id + 1, MPI_COMM_WORLD, send_request++);
+                        counter++;
                     }
                 }
 
@@ -979,13 +1004,27 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                 }
 
                 MPI_Type_free(&columnstype);
+            }
+            
+            MPI_Waitall(n_request, send_request-n_request, MPI_STATUSES_IGNORE);
+
+            for (id = i * n_cut; id < (i + 1) * n_cut; id++)
+            {
+                int portion = id % n_cut;
+                int image_n = i;
+
+                // printf("Processing portion %d of image %d with rank %d.\n", portion, image_n, rank);
+
+                int work_width = image->width[image_n] / n_cut;
+                int start_column = portion * work_width;
+                int end_column = (portion + 1) * work_width;
 
                 if (id % n_process == rank)
                 {
-// #pragma omp parallel shared(p, new, size, height, i, width, threshold, end, id) private(k) default(none)
+                    // #pragma omp parallel shared(p, new, size, height, i, width, threshold, end, id) private(k) default(none)
                     {
-/* Apply blur on top part of image (10%) */
-// #pragma omp for schedule(dynamic)
+                        /* Apply blur on top part of image (10%) */
+                        // #pragma omp for schedule(dynamic)
                         for (j = size; j < height / 10 - size; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1013,7 +1052,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
                         /* Copy the middle part of the image */
                         int limit = height * 0.9 + size;
-// #pragma omp for schedule(dynamic)
+                        // #pragma omp for schedule(dynamic)
                         for (j = height / 10 - size; j < limit; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1024,8 +1063,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                             }
                         }
 
-/* Apply blur on the bottom part of the image (10%) */
-// #pragma omp for schedule(dynamic)
+                        /* Apply blur on the bottom part of the image (10%) */
+                        // #pragma omp for schedule(dynamic)
                         for (j = height * 0.9 + size; j < height - size; j++)
                         {
                             for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -1051,8 +1090,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                             }
                         }
 
-// Check if need to stop.
-// #pragma omp for schedule(dynamic)
+                        // Check if need to stop.
+                        // #pragma omp for schedule(dynamic)
                         for (j = 1; j < height - 1; j++)
                         {
                             for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
@@ -1070,7 +1109,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                                     diff_g > threshold || -diff_g > threshold ||
                                     diff_b > threshold || -diff_b > threshold)
                                 {
-// #pragma omp atom
+                                    // #pragma omp atom
                                     end = 0;
                                 }
 
