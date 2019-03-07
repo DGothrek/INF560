@@ -23,7 +23,7 @@ int blur_size = 5;
  *  - m: mpi
  *  - g: gpu
  **/
-char mode = 'o';
+char mode = 'a';
 
 /** The main function reads the arguments and decide what to do depending
  *  on the type of image, the number of MPI rank and the number of omp threads */
@@ -109,10 +109,21 @@ int main(int argc, char **argv)
     {
       return 1;
     }
-    // apply_filters_gpu(image);
 
+    apply_filters_gpu(image);
     export_seq(output_filename, image);
 
+    break;
+
+  /* Only gray */
+  case 'a':
+    image = load_image_seq(input_filename);
+    if (image == NULL)
+    {
+      return 1;
+    }
+    apply_gray_filter_gpu(image);
+    export_seq(output_filename, image);
     break;
   }
 
@@ -130,6 +141,45 @@ void apply_filters_seq(animated_gif *image)
 
   /* Convert the pixels into grayscale */
   apply_gray_filter_seq(image);
+
+#if DISPLAY_TIME
+  gettimeofday(&t2, NULL);
+  duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+  printf("  GRAY filter: %lf s\n", duration);
+  gettimeofday(&t1, NULL);
+#endif
+
+  /* Apply blur filter with convergence value */
+  apply_blur_filter_seq(image, blur_size, 20);
+
+#if DISPLAY_TIME
+  gettimeofday(&t2, NULL);
+  duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+  printf("  BLUR filter: %lf s\n", duration);
+  gettimeofday(&t1, NULL);
+#endif
+
+  /* Apply sobel filter on pixels */
+  apply_sobel_filter_seq(image);
+
+#if DISPLAY_TIME
+  gettimeofday(&t2, NULL);
+  duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+  printf("  SOBEL filter: %lf s\n", duration);
+  gettimeofday(&t1, NULL);
+#endif
+}
+
+void apply_filters_gpu(animated_gif *image)
+{
+#if DISPLAY_TIME
+  struct timeval t1, t2;
+  double duration;
+  gettimeofday(&t1, NULL);
+#endif
+
+  /* Convert the pixels into grayscale */
+  apply_gray_filter_gpu(image);
 
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);

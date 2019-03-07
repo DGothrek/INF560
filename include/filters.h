@@ -15,6 +15,7 @@
 /* Main */
 int apply_filters_mpi(animated_gif *image, char *output_filename, int root);
 void apply_filters_seq(animated_gif *image);
+void apply_filters_gpu(animated_gif *image);
 void apply_filters_omp(animated_gif *image);
 
 /* Basic load and store */
