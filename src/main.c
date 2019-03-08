@@ -23,7 +23,7 @@ int blur_size = 5;
  *  - m: mpi
  *  - g: gpu
  **/
-char mode = 'a';
+char mode = 'g';
 
 /** The main function reads the arguments and decide what to do depending
  *  on the type of image, the number of MPI rank and the number of omp threads */
@@ -199,7 +199,7 @@ void apply_filters_gpu(animated_gif *image)
 #endif
 
   /* Apply sobel filter on pixels */
-  apply_sobel_filter_seq(image);
+  apply_sobel_filter_gpu(image);
 
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);

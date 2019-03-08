@@ -15,18 +15,21 @@
 /********************************************************
  * Device functions *************************************
  ********************************************************/
-__global__ void gray(pixel *im, pixel *im_new, int height, int width)
+__global__ void gray(pixel *im, int height, int width)
 {
-  int i, j, moy, pos;
-  i = threadIdx.x + blockIdx.x * blockDim.x;
-  j = threadIdx.y + blockIdx.y * blockDim.y;
+  // int i, j;
+  int moy, pos;
+  // j = threadIdx.x + blockIdx.x * blockDim.x;
+  // i = threadIdx.y + blockIdx.y * blockDim.y;
+  pos = threadIdx.x + blockIdx.x * blockDim.x;
   // int id = threadIdx.x
   //         + blockDim.x*threadIdx.y
   //         + blockIdx.x*blockDim.x*blockDim.y
   //         + blockIdx.y*blockDim.x*blockDim.y*gridDim.x;
 
-  pos = i + j * width;
-  if (i < height && j < width)
+  // pos = i + j * width;
+  // if (i < height && j < width)
+  if (pos < width * height)
   {
     moy = (im[pos].r + im[pos].g + im[pos].b) / 3;
     if (moy < 0)
@@ -34,9 +37,9 @@ __global__ void gray(pixel *im, pixel *im_new, int height, int width)
     if (moy > 255)
       moy = 255;
 
-    im_new[pos].r = moy;
-    im_new[pos].g = moy;
-    im_new[pos].b = moy;
+    im[pos].r = moy;
+    im[pos].g = moy;
+    im[pos].b = moy;
   }
 }
 
@@ -46,9 +49,11 @@ __global__ void blur()
 
 __global__ void sobel(pixel *im, pixel *im_new, int height, int width)
 {
-  int i, j;
-  i = threadIdx.x + blockIdx.x * blockDim.x;
-  j = threadIdx.y + blockIdx.y * blockDim.y;
+  int i, j, pos;
+
+  pos = threadIdx.x + blockIdx.x * blockDim.x;
+  i = pos / width;
+  j = pos % width;
 
   int pixel_blue_no, pixel_blue_n, pixel_blue_ne;
   int pixel_blue_so, pixel_blue_s, pixel_blue_se;
@@ -123,15 +128,18 @@ extern "C"
     if (print_time)
       gettimeofday(&t1, NULL);
 
-    pixel *device_image, *device_new;
+    pixel *device_image;
     cudaMalloc(&device_image, size * sizeof(pixel));
-    cudaMalloc(&device_new, size * sizeof(pixel));
 
     // Image cut into n*m rectangles
-    int n = width / deviceProp.maxThreadsPerBlock + 1;
-    int m = height / deviceProp.maxThreadsPerBlock + 1;
-    dim3 dimGrid(n, m);
-    dim3 dimBlock(width / n + 1, height / m + 1);
+    // int n = width / deviceProp.maxThreadsPerBlock + 1;
+    // int m = height / deviceProp.maxThreadsPerBlock + 1;
+    // int n = width / 32 + 1;
+    // int m = height / 32 + 1;
+    // dim3 dimGrid(n, m);
+    // dim3 dimBlock(width / n + 1, height / m + 1);
+    dim3 dimGrid(size / deviceProp.maxThreadsPerBlock + 1);
+    dim3 dimBlock(deviceProp.maxThreadsPerBlock);
 
     if (print_time)
     {
@@ -150,21 +158,28 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf(cudaGetErrorString(cudaGetLastError()));
+        printf("\n");
         gettimeofday(&t1, NULL);
       }
 
+
+
       // Computation
-      gray<<<dimGrid, dimBlock>>>(device_image, device_new, height, width);
+      gray<<<dimGrid, dimBlock>>>(device_image, height, width);
+
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Computation done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf(cudaGetErrorString(cudaGetLastError()));
+        printf("\n");
         gettimeofday(&t1, NULL);
       }
 
       // Transfer back
-      cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
+      cudaMemcpy(image->p[im_num], device_image, size * sizeof(pixel), cudaMemcpyDeviceToHost);
       if (print_time)
       {
         gettimeofday(&t2, NULL);
@@ -208,11 +223,9 @@ extern "C"
     cudaMalloc(&device_image, size * sizeof(pixel));
     cudaMalloc(&device_new, size * sizeof(pixel));
 
-    // Image cut into n*m rectangles
-    int n = width / deviceProp.maxThreadsPerBlock + 1;
-    int m = height / deviceProp.maxThreadsPerBlock + 1;
-    dim3 dimGrid(n, m);
-    dim3 dimBlock(width / n + 1, height / m + 1);
+    dim3 dimGrid(size / deviceProp.maxThreadsPerBlock + 1);
+    dim3 dimBlock(deviceProp.maxThreadsPerBlock);
+
 
     if (print_time)
     {
@@ -231,16 +244,21 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf(cudaGetErrorString(cudaGetLastError()));
+        printf("\n");
         gettimeofday(&t1, NULL);
       }
 
       // Computation
       sobel<<<dimGrid, dimBlock>>>(device_image, device_new, height, width);
+
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Computation done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf(cudaGetErrorString(cudaGetLastError()));
+        printf("\n");
         gettimeofday(&t1, NULL);
       }
 
