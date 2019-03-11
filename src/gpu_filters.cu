@@ -60,14 +60,15 @@ __global__ void blur(pixel *im, pixel *im_new, int *n_iter, int height, int widt
   j = pos / width;
   k = pos % width;
 
-
-  *n_iter = 0;
+  if ( k == 0 && j == 0 ) 
+    *n_iter = 0;
 
   /* Perform at least one blur iteration */
   do
   {
-      end = 1;
-      *n_iter++;
+      if ( k == 0 && j == 0 ) 
+        end = 1;
+        *n_iter = *n_iter+1;
 
       if ( k >= size && k < width - size) 
       {
@@ -126,15 +127,16 @@ __global__ void blur(pixel *im, pixel *im_new, int *n_iter, int height, int widt
               {
                   end = 0;
               }
+      }
 
-              // Wait for all the threads to have tested the end condition
-              __threadfence();
+      // Wait for all the threads to have tested the end condition
+      __threadfence();
 
-              // Erase and copy for new iteration
-              im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
-              im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
-              im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
-        }
+      // Erase and copy for new iteration
+      im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
+      im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
+      im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
+
     } while (threshold > 0 && !end);
 }
 
@@ -154,7 +156,7 @@ __global__ void sobel(pixel *im, pixel *im_new, int height, int width)
   float deltaY_blue;
   float val_blue;
 
-  if (i > 1 && i < height - 1 && j > 1 && j < width - 1)
+  if (i >= 1 && i < height - 1 && j >= 1 && j < width - 1)
   {
     pixel_blue_no = im[CONV(i - 1, j - 1, width)].b;
     pixel_blue_n = im[CONV(i - 1, j, width)].b;
