@@ -189,7 +189,7 @@ void apply_filters_gpu(animated_gif *image)
 #endif
 
   /* Apply blur filter with convergence value */
-  apply_blur_filter_seq(image, blur_size, 20);
+  apply_blur_filter_gpu(image, blur_size, 20);
 
 #if DISPLAY_TIME
   gettimeofday(&t2, NULL);
