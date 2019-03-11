@@ -117,17 +117,20 @@ __global__ void blur(pixel *im, pixel *im_new, int *end,
         diff_g > threshold || -diff_g > threshold ||
         diff_b > threshold || -diff_b > threshold)
     {
-      end = 0;
+      *end = 0;
     }
   }
 
   // Wait for all the threads to have tested the end condition
   __threadfence();
 
-  // Erase and copy for new iteration
-  im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
-  im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
-  im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
+  if (j >= 1 && j < height - 1 && k >= 1 && k < width - 1)
+  {
+    // Erase and copy for new iteration
+    im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
+    im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
+    im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
+  }
 }
 
 __global__ void sobel(pixel *im, pixel *im_new, int height, int width)
@@ -305,23 +308,27 @@ extern "C"
       cudaMemcpy(device_image, image->p[im_num], size * sizeof(pixel), cudaMemcpyHostToDevice);
 
       // Computation
+      int num_iter = 0;
       end_host = 1;
       do
       {
+        num_iter++;
         blur<<<dimGrid, dimBlock>>>(device_image, device_new, end_dev, height, width, blur_size, threshold);
         cudaMemcpy(&end_host, end_dev, sizeof(int), cudaMemcpyDeviceToHost);
-        printf("Image %d iteration %d\n", im_num, end_host);
-      } while (threshold > 0 && !end_host)
+      } while (threshold > 0 && !end_host);
 
-          // Transfer back: could be optimized because only the first and last 10% will change
-          cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
-
-      printf("Processed image %d in %d iterations.\n", im_num, n_iter_host);
+      // Transfer back: could be optimized because only the first and last 10% will change
+      cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
+      if (print_time) {
+        printf("    Image %d processed in %d iteration(s) and ", im_num, ++num_iter);
+        printf(cudaGetErrorString(cudaGetLastError()));
+        printf("\n");
+      }
     }
 
     cudaFree(device_image);
     cudaFree(device_new);
-    cudaFree(n_iter_dev);
+    cudaFree(end_dev);
   }
 
   void apply_sobel_filter_gpu(animated_gif *image)
@@ -357,7 +364,7 @@ extern "C"
     if (print_time)
     {
       gettimeofday(&t2, NULL);
-      printf("Alloc done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+      printf("    Alloc done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
       gettimeofday(&t1, NULL);
     }
 
@@ -371,7 +378,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         printf(cudaGetErrorString(cudaGetLastError()));
         printf("\n");
         gettimeofday(&t1, NULL);
@@ -383,7 +390,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         printf(cudaGetErrorString(cudaGetLastError()));
         printf("\n");
         gettimeofday(&t1, NULL);
@@ -394,7 +401,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer back done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Transfer back done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         gettimeofday(&t1, NULL);
       }
     }
