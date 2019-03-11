@@ -45,99 +45,89 @@ __global__ void gray(pixel *im, int height, int width)
   }
 }
 
-__device__ int end;
-
-__global__ void blur(pixel *im, pixel *im_new, int *n_iter, int height, int width, int size, int threshold)
+__global__ void blur(pixel *im, pixel *im_new, int *end,
+                     int height, int width, int size, int threshold)
 {
   /** 
-   * Variable end shared between all threads in the device.
-   * Blur algo ends if one thread set end to 0
+   * Perform one blur iteration and store in end if we need more
    **/
-  
+
   int j, k, pos;
 
   pos = threadIdx.x + blockIdx.x * blockDim.x;
   j = pos / width;
   k = pos % width;
 
-  if ( k == 0 && j == 0 ) 
-    *n_iter = 0;
-
-  /* Perform at least one blur iteration */
-  do
+  if (k == 0 && j == 0)
   {
-      if ( k == 0 && j == 0 ) 
-        end = 1;
-        *n_iter = *n_iter+1;
+    *end = 1;
+  }
 
-      if ( k >= size && k < width - size) 
-      {
+  if (k >= size && k < width - size)
+  {
 
-        if (   j >= size && j < height / 10 - size
-            || j >= height * 0.9 + size && j < height - size)
-        {
-              /* If in the top or bottom 10% :
+    if (j >= size && j < height / 10 - size || j >= height * 0.9 + size && j < height - size)
+    {
+      /* If in the top or bottom 10% :
               Apply blur on top part of image (10%) */
-              int stencil_j, stencil_k;
-              int t_r = 0;
-              int t_g = 0;
-              int t_b = 0;
+      int stencil_j, stencil_k;
+      int t_r = 0;
+      int t_g = 0;
+      int t_b = 0;
 
-              for (stencil_j = -size; stencil_j <= size; stencil_j++)
-              {
-                  for (stencil_k = -size; stencil_k <= size; stencil_k++)
-                  {
-                      t_r += im[CONV(j + stencil_j, k + stencil_k, width)].r;
-                      t_g += im[CONV(j + stencil_j, k + stencil_k, width)].g;
-                      t_b += im[CONV(j + stencil_j, k + stencil_k, width)].b;
-                  }
-              }
-
-              im_new[CONV(j, k, width)].r = t_r / ((2 * size + 1) * (2 * size + 1));
-              im_new[CONV(j, k, width)].g = t_g / ((2 * size + 1) * (2 * size + 1));
-              im_new[CONV(j, k, width)].b = t_b / ((2 * size + 1) * (2 * size + 1));
-        }
-
-        if ( j >= height / 10 - size && j < height * 0.9 + size)
-        {
-          /* Just copy the middle part of the image */
-          im_new[CONV(j, k, width)].r = im[CONV(j, k, width)].r;
-          im_new[CONV(j, k, width)].g = im[CONV(j, k, width)].g;
-          im_new[CONV(j, k, width)].b = im[CONV(j, k, width)].b;
-        }
-      }
-
-      // Wait until all threads have written in the memory
-      __threadfence();
-
-      // Test the end condition
-      if (j >= 1 && j < height - 1 && k >= 1 && k < width - 1)
+      for (stencil_j = -size; stencil_j <= size; stencil_j++)
       {
-              float diff_r;
-              float diff_g;
-              float diff_b;
-
-              diff_r = (im_new[CONV(j, k, width)].r - im[CONV(j, k, width)].r);
-              diff_g = (im_new[CONV(j, k, width)].g - im[CONV(j, k, width)].g);
-              diff_b = (im_new[CONV(j, k, width)].b - im[CONV(j, k, width)].b);
-
-              if (diff_r > threshold || -diff_r > threshold ||
-                  diff_g > threshold || -diff_g > threshold ||
-                  diff_b > threshold || -diff_b > threshold)
-              {
-                  end = 0;
-              }
+        for (stencil_k = -size; stencil_k <= size; stencil_k++)
+        {
+          t_r += im[CONV(j + stencil_j, k + stencil_k, width)].r;
+          t_g += im[CONV(j + stencil_j, k + stencil_k, width)].g;
+          t_b += im[CONV(j + stencil_j, k + stencil_k, width)].b;
+        }
       }
 
-      // Wait for all the threads to have tested the end condition
-      __threadfence();
+      im_new[CONV(j, k, width)].r = t_r / ((2 * size + 1) * (2 * size + 1));
+      im_new[CONV(j, k, width)].g = t_g / ((2 * size + 1) * (2 * size + 1));
+      im_new[CONV(j, k, width)].b = t_b / ((2 * size + 1) * (2 * size + 1));
+    }
 
-      // Erase and copy for new iteration
-      im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
-      im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
-      im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
+    if (j >= height / 10 - size && j < height * 0.9 + size)
+    {
+      /* Just copy the middle part of the image */
+      im_new[CONV(j, k, width)].r = im[CONV(j, k, width)].r;
+      im_new[CONV(j, k, width)].g = im[CONV(j, k, width)].g;
+      im_new[CONV(j, k, width)].b = im[CONV(j, k, width)].b;
+    }
+  }
 
-    } while (threshold > 0 && !end);
+  // Wait until all threads have written in the memory
+  __threadfence();
+
+  // Test the end condition
+  if (j >= 1 && j < height - 1 && k >= 1 && k < width - 1)
+  {
+    float diff_r;
+    float diff_g;
+    float diff_b;
+
+    diff_r = (im_new[CONV(j, k, width)].r - im[CONV(j, k, width)].r);
+    diff_g = (im_new[CONV(j, k, width)].g - im[CONV(j, k, width)].g);
+    diff_b = (im_new[CONV(j, k, width)].b - im[CONV(j, k, width)].b);
+
+    if (diff_r > threshold || -diff_r > threshold ||
+        diff_g > threshold || -diff_g > threshold ||
+        diff_b > threshold || -diff_b > threshold)
+    {
+      end = 0;
+    }
+  }
+
+  // Wait for all the threads to have tested the end condition
+  __threadfence();
+
+  // Erase and copy for new iteration
+  im[CONV(j, k, width)].r = im_new[CONV(j, k, width)].r;
+  im[CONV(j, k, width)].g = im_new[CONV(j, k, width)].g;
+  im[CONV(j, k, width)].b = im_new[CONV(j, k, width)].b;
 }
 
 __global__ void sobel(pixel *im, pixel *im_new, int height, int width)
@@ -173,21 +163,22 @@ __global__ void sobel(pixel *im, pixel *im_new, int height, int width)
 
     if (val_blue > 50)
     {
-        im_new[CONV(i, j, width)].r = 255;
-        im_new[CONV(i, j, width)].g = 255;
-        im_new[CONV(i, j, width)].b = 255;
+      im_new[CONV(i, j, width)].r = 255;
+      im_new[CONV(i, j, width)].g = 255;
+      im_new[CONV(i, j, width)].b = 255;
     }
     else
     {
-        im_new[CONV(i, j, width)].r = 0;
-        im_new[CONV(i, j, width)].g = 0;
-        im_new[CONV(i, j, width)].b = 0;
+      im_new[CONV(i, j, width)].r = 0;
+      im_new[CONV(i, j, width)].g = 0;
+      im_new[CONV(i, j, width)].b = 0;
     }
   }
 
   else
-  { 
-    if (i < height && j < width) {
+  {
+    if (i < height && j < width)
+    {
       im_new[CONV(i, j, width)] = im[CONV(i, j, width)];
     }
   }
@@ -256,8 +247,6 @@ extern "C"
         gettimeofday(&t1, NULL);
       }
 
-
-
       // Computation
       gray<<<dimGrid, dimBlock>>>(device_image, height, width);
 
@@ -291,47 +280,49 @@ extern "C"
     int width = image->width[0];
     int height = image->height[0];
     int size = width * height;
-        
-    int *n_iter_dev, n_iter_host;
+
+    int *end_dev, end_host;
 
     cudaDeviceProp deviceProp;
     cudaGetDeviceProperties(&deviceProp, 0);
 
-
-      /**
+    /**
       * Allocation on the device once for all the images (if multiple)
       * Memory allocation + dimension of grid
       **/
     pixel *device_image, *device_new;
     cudaMalloc(&device_image, size * sizeof(pixel));
     cudaMalloc(&device_new, size * sizeof(pixel));
-    cudaMalloc(&n_iter_dev, sizeof(int));
+    cudaMalloc(&end_dev, sizeof(int));
 
     dim3 dimGrid(size / deviceProp.maxThreadsPerBlock + 1);
     dim3 dimBlock(deviceProp.maxThreadsPerBlock);
 
+    /* Process all images */
+    for (im_num = 0; im_num < image->n_images; im_num++)
+    {
+      // Memory transfer
+      cudaMemcpy(device_image, image->p[im_num], size * sizeof(pixel), cudaMemcpyHostToDevice);
 
-      /* Process all images */
-      for (im_num = 0; im_num < image->n_images; im_num++)
+      // Computation
+      end_host = 1;
+      do
       {
-          // Memory transfer
-          cudaMemcpy(device_image, image->p[im_num], size * sizeof(pixel), cudaMemcpyHostToDevice);
-
-          // Computation
-          blur<<<dimGrid, dimBlock>>>(device_image, device_new, n_iter_dev, height, width, blur_size, threshold);
+        blur<<<dimGrid, dimBlock>>>(device_image, device_new, end_dev, height, width, blur_size, threshold);
+        cudaMemcpy(&end_host, end_dev, sizeof(int), cudaMemcpyDeviceToHost);
+        printf("Image %d iteration %d\n", im_num, end_host);
+      } while (threshold > 0 && !end_host)
 
           // Transfer back: could be optimized because only the first and last 10% will change
           cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
-          cudaMemcpy(&n_iter_host, n_iter_dev, sizeof(int), cudaMemcpyDeviceToHost);
 
-          printf("Processed image %d in %d iterations.\n", im_num, n_iter_host);
-      }
+      printf("Processed image %d in %d iterations.\n", im_num, n_iter_host);
+    }
 
-      cudaFree(device_image);
-      cudaFree(device_new);
-      cudaFree(n_iter_dev);
+    cudaFree(device_image);
+    cudaFree(device_new);
+    cudaFree(n_iter_dev);
   }
-
 
   void apply_sobel_filter_gpu(animated_gif *image)
   {
@@ -362,7 +353,6 @@ extern "C"
 
     dim3 dimGrid(size / deviceProp.maxThreadsPerBlock + 1);
     dim3 dimBlock(deviceProp.maxThreadsPerBlock);
-
 
     if (print_time)
     {
