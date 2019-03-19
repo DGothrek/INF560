@@ -23,7 +23,7 @@ int blur_size = 5;
  *  - m: mpi
  *  - g: gpu
  **/
-char mode = 'g';
+char mode = 'm';
 
 /** The main function reads the arguments and decide what to do depending
  *  on the type of image, the number of MPI rank and the number of omp threads */

@@ -85,22 +85,26 @@ void apply_gray_filter_mpi(animated_gif *image, int n_cut, int root)
         end_column = image->width[image_n];
       }
 
-      for (j = 0; j < image->height[image_n]; j++)
+#pragma omp parallel shared(p, image, image_n, start_column, end_column) private(j, pos) default(none)
       {
-        for (pos = (j * image->width[image_n]) + start_column; pos < (j * image->width[image_n]) + end_column; pos++)
+#pragma omp for schedule(dynamic)
+        for (j = 0; j < image->height[image_n]; j++)
         {
-          int moy;
+          for (pos = (j * image->width[image_n]) + start_column; pos < (j * image->width[image_n]) + end_column; pos++)
+          {
+            int moy;
 
-          // moy = p[i][pos].r/4 + ( p[i][pos].g * 3/4 ) ;
-          moy = (p[image_n][pos].r + p[image_n][pos].g + p[image_n][pos].b) / 3;
-          if (moy < 0)
-            moy = 0;
-          if (moy > 255)
-            moy = 255;
+            // moy = p[i][pos].r/4 + ( p[i][pos].g * 3/4 ) ;
+            moy = (p[image_n][pos].r + p[image_n][pos].g + p[image_n][pos].b) / 3;
+            if (moy < 0)
+              moy = 0;
+            if (moy > 255)
+              moy = 255;
 
-          p[image_n][pos].r = moy;
-          p[image_n][pos].g = moy;
-          p[image_n][pos].b = moy;
+            p[image_n][pos].r = moy;
+            p[image_n][pos].g = moy;
+            p[image_n][pos].b = moy;
+          }
         }
       }
     }
@@ -111,18 +115,6 @@ void apply_gray_filter_mpi(animated_gif *image, int n_cut, int root)
      */
   // MPI_Barrier(MPI_COMM_WORLD);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, int threshold)
 {
@@ -238,7 +230,10 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
         MPI_Type_free(&columnstype);
       }
 
-      MPI_Waitall(n_request, send_request - n_request, MPI_STATUSES_IGNORE);
+      if (n_process > 1)
+      {
+        MPI_Waitall(n_request, send_request - n_request, MPI_STATUSES_IGNORE);
+      }
 
       for (id = i * n_cut; id < (i + 1) * n_cut; id++)
       {
@@ -253,10 +248,10 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
         if (id % n_process == rank)
         {
-          // #pragma omp parallel shared(p, new, size, height, i, width, threshold, end, id) private(k) default(none)
+#pragma omp parallel shared(p, new, size, height, i, width, threshold, end, id, start_column, end_column) private(k) default(none)
           {
-            /* Apply blur on top part of image (10%) */
-            // #pragma omp for schedule(dynamic)
+/* Apply blur on top part of image (10%) */
+#pragma omp for schedule(dynamic)
             for (j = size; j < height / 10 - size; j++)
             {
               for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -284,7 +279,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
 
             /* Copy the middle part of the image */
             int limit = height * 0.9 + size;
-            // #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
             for (j = height / 10 - size; j < limit; j++)
             {
               for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -295,8 +290,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
               }
             }
 
-            /* Apply blur on the bottom part of the image (10%) */
-            // #pragma omp for schedule(dynamic)
+/* Apply blur on the bottom part of the image (10%) */
+#pragma omp for schedule(dynamic)
             for (j = height * 0.9 + size; j < height - size; j++)
             {
               for (k = MAX(start_column, size); k < MIN(end_column, width - size); k++)
@@ -322,8 +317,8 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
               }
             }
 
-            // Check if need to stop.
-            // #pragma omp for schedule(dynamic)
+// Check if need to stop.
+#pragma omp for schedule(dynamic)
             for (j = 1; j < height - 1; j++)
             {
               for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
@@ -341,7 +336,7 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
                     diff_g > threshold || -diff_g > threshold ||
                     diff_b > threshold || -diff_b > threshold)
                 {
-                  // #pragma omp atom
+#pragma omp atom
                   end = 0;
                 }
 
@@ -416,11 +411,6 @@ void apply_blur_filter_mpi(animated_gif *image, int n_cut, int root, int size, i
   }
 }
 
-
-
-
-
-
 void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
 {
   int n_process, rank;
@@ -454,10 +444,10 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
       height = image->height[image_n];
       sobel = (pixel *)malloc(width * height * sizeof(pixel));
 
-      // #pragma omp parallel shared(sobel, p, width, height, i) default(none)
+#pragma omp parallel shared(sobel, p, width, height, i, start_column, end_column, image_n) private(j) default(none)
       {
         int k;
-        // #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
         for (j = 1; j < height - 1; j++)
         {
           for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
@@ -501,7 +491,7 @@ void apply_sobel_filter_mpi(animated_gif *image, int n_cut, int root)
           }
         }
 
-        // #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
         for (j = 1; j < height - 1; j++)
         {
           for (k = MAX(start_column, 1); k < MIN(end_column, width - 1); k++)
