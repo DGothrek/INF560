@@ -1,7 +1,8 @@
 # Project of INF560: Parallel Computing
+Réalisé par Louis Raison et Maël Madon
 
-## Comparer l'égalité
-Pour comparer les images produites avec les images traitées de référence, lancer le script compare_ref.sh.
+## Comparer les images (fonctionne mal)
+Pour comparer les images produites avec les images traitées de référence, lancer le script compare_ref.sh. Il utilise un algorithme de comparaison octet par octet des fichiers gifs, codé dans src/compare.c.
 
 ## Ideas
 

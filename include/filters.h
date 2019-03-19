@@ -25,7 +25,7 @@ int store_pixels(char *filename, animated_gif *image);
 animated_gif *load_image_seq(char *input_filename);
 
 /* Sequential filters */
-void apply_gray_filter_seq( animated_gif * image );
+void apply_gray_filter_seq(animated_gif *image);
 void apply_gray_line(animated_gif *image);
 void apply_blur_filter_seq(animated_gif *image, int size, int threshold);
 void apply_sobel_filter_seq(animated_gif *image);
@@ -50,6 +50,7 @@ extern "C"
     void apply_gray_filter_gpu(animated_gif *image);
     void apply_blur_filter_gpu(animated_gif *image, int size, int threshold);
     void apply_sobel_filter_gpu(animated_gif *image);
+    void apply_all_filters_gpu(animated_gif *image, int size, int threshold);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@
 
 #include <filters.h>
 
-int print_time = 1;
+int print_time = 0;
 
 /********************************************************
  * Device functions *************************************
@@ -60,6 +60,7 @@ __global__ void blur(pixel *im, pixel *im_new, int *end,
 
   if (k == 0 && j == 0)
   {
+    /* One process only in charge of updating end */
     *end = 1;
   }
 
@@ -69,7 +70,7 @@ __global__ void blur(pixel *im, pixel *im_new, int *end,
     if (j >= size && j < height / 10 - size || j >= height * 0.9 + size && j < height - size)
     {
       /* If in the top or bottom 10% :
-              Apply blur on top part of image (10%) */
+         Apply blur on top or bottom part of image (10%) */
       int stencil_j, stencil_k;
       int t_r = 0;
       int t_g = 0;
@@ -230,7 +231,7 @@ extern "C"
     if (print_time)
     {
       gettimeofday(&t2, NULL);
-      printf("Alloc done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+      printf("    Alloc done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
       gettimeofday(&t1, NULL);
     }
 
@@ -244,7 +245,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Transfer done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         printf(cudaGetErrorString(cudaGetLastError()));
         printf("\n");
         gettimeofday(&t1, NULL);
@@ -256,7 +257,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Computation done in %ld us with ", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         printf(cudaGetErrorString(cudaGetLastError()));
         printf("\n");
         gettimeofday(&t1, NULL);
@@ -267,7 +268,7 @@ extern "C"
       if (print_time)
       {
         gettimeofday(&t2, NULL);
-        printf("Transfer back done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
+        printf("    Transfer back done in %ld us\n", (t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec));
         gettimeofday(&t1, NULL);
       }
     }
@@ -319,7 +320,8 @@ extern "C"
 
       // Transfer back: could be optimized because only the first and last 10% will change
       cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
-      if (print_time) {
+      if (print_time)
+      {
         printf("    Image %d processed in %d iteration(s) and ", im_num, ++num_iter);
         printf(cudaGetErrorString(cudaGetLastError()));
         printf("\n");
@@ -409,4 +411,60 @@ extern "C"
     cudaFree(device_image);
     cudaFree(device_new);
   }
+}
+
+void apply_all_filters_gpu(animated_gif *image, int blur_size, int threshold)
+{
+  /** 
+    * Apply the three last filters with the help of the GPU.
+    * To avoid memcopying 3 times, we merged apply_gray, apply_blur and apply_sobel
+    **/
+
+  int im_num;
+  int width = image->width[0];
+  int height = image->height[0];
+  int size = width * height;
+
+  int *end_dev, end_host; // to know when blur has finished
+
+  cudaDeviceProp deviceProp;
+  cudaGetDeviceProperties(&deviceProp, 0);
+
+  /**
+     * Allocation on the device once for all the images (if multiple)
+     * Memory allocation + dimension of grid
+     **/
+  dim3 dimGrid(10*size / deviceProp.maxThreadsPerBlock + 1);
+  dim3 dimBlock(deviceProp.maxThreadsPerBlock/10);
+
+  pixel *device_image, *device_new;
+  cudaMalloc(&device_image, size * sizeof(pixel));
+  cudaMalloc(&device_new, size * sizeof(pixel));
+  cudaMalloc(&end_dev, sizeof(int));
+
+  /* For all images, blur than sobel */
+  for (im_num = 0; im_num < image->n_images; im_num++)
+  {
+    cudaMemcpy(device_image, image->p[im_num], size * sizeof(pixel), cudaMemcpyHostToDevice);
+
+    gray<<<dimGrid, dimBlock>>>(device_image, height, width);
+    /* Bluring while it isn't finished */
+    int num_iter = 0;
+    end_host = 1;
+    do
+    {
+      num_iter++;
+      blur<<<dimGrid, dimBlock>>>(device_image, device_new, end_dev, height, width, blur_size, threshold);
+      cudaMemcpy(&end_host, end_dev, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (threshold > 0 && !end_host);
+
+    /* Applying sobel */
+    sobel<<<dimGrid, dimBlock>>>(device_image, device_new, height, width);
+
+    cudaMemcpy(image->p[im_num], device_new, size * sizeof(pixel), cudaMemcpyDeviceToHost);
+  }
+
+  cudaFree(device_image);
+  cudaFree(device_new);
+  cudaFree(end_dev);
 }

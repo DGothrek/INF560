@@ -1,0 +1,92 @@
+nvcc -Iinclude -c -o obj/gpu_filters.o src/gpu_filters.cu
+mpicc -fopenmp -O3 -Iinclude  -lm -L/usr/local/cuda/lib64 -lcudart -o sobelf obj/dgif_lib.o obj/egif_lib.o obj/gif_err.o obj/gif_font.o obj/gif_hash.o obj/gifalloc.o obj/gpu_filters.o obj/omp_filters.o obj/mpi_filters.o obj/seq_functions.o obj/main.o obj/openbsd-reallocarray.o obj/quantize.o
+Running test on images/original/051009.vince.gif -> images/processed/051009.vince.gif
+GIF loaded from file images/original/051009.vince.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.032180 s
+  PARAL filters: 0.094248 s
+  EXPORT: 0.218750 s
+Running test on images/original/1.gif -> images/processed/1.gif
+GIF loaded from file images/original/1.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.056656 s
+  PARAL filters: 0.111971 s
+  EXPORT: 0.155016 s
+Running test on images/original/200_s.gif -> images/processed/200_s.gif
+GIF loaded from file images/original/200_s.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.003015 s
+  PARAL filters: 0.089778 s
+  EXPORT: 0.002754 s
+Running test on images/original/9815573.gif -> images/processed/9815573.gif
+GIF loaded from file images/original/9815573.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.036439 s
+  PARAL filters: 0.082874 s
+  EXPORT: 0.087927 s
+Running test on images/original/australian-flag-large.gif -> images/processed/australian-flag-large.gif
+GIF loaded from file images/original/australian-flag-large.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.017341 s
+  PARAL filters: 0.084064 s
+  EXPORT: 0.022092 s
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr.gif
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.337552 s
+  PARAL filters: 1.028502 s
+  EXPORT: 0.735460 s
+Running test on images/original/Campusplan-Mobilitaetsbeschraenkte.gif -> images/processed/Campusplan-Mobilitaetsbeschraenkte.gif
+GIF loaded from file images/original/Campusplan-Mobilitaetsbeschraenkte.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.348137 s
+  PARAL filters: 0.894641 s
+  EXPORT: 1.311829 s
+Running test on images/original/fire.gif -> images/processed/fire.gif
+GIF loaded from file images/original/fire.gif with 33 image(s)
+EXECUTION TIME:
+  LOADING:      0.003529 s
+  PARAL filters: 0.086177 s
+  EXPORT: 0.004775 s
+Running test on images/original/frame_002.gif -> images/processed/frame_002.gif
+GIF loaded from file images/original/frame_002.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.006842 s
+  PARAL filters: 0.083451 s
+  EXPORT: 0.005058 s
+Running test on images/original/giphy-3.gif -> images/processed/giphy-3.gif
+GIF loaded from file images/original/giphy-3.gif with 5 image(s)
+EXECUTION TIME:
+  LOADING:      0.114525 s
+  PARAL filters: 0.701695 s
+  EXPORT: 0.953770 s
+Running test on images/original/Mandelbrot-large.gif -> images/processed/Mandelbrot-large.gif
+GIF loaded from file images/original/Mandelbrot-large.gif with 20 image(s)
+EXECUTION TIME:
+  LOADING:      0.189505 s
+  PARAL filters: 0.370125 s
+  EXPORT: 2.429509 s
+Running test on images/original/porsche.gif -> images/processed/porsche.gif
+GIF loaded from file images/original/porsche.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.003026 s
+  PARAL filters: 0.085749 s
+  EXPORT: 0.002653 s
+Running test on images/original/Produits_sous_linux.gif -> images/processed/Produits_sous_linux.gif
+GIF loaded from file images/original/Produits_sous_linux.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.019184 s
+  PARAL filters: 0.084446 s
+  EXPORT: 0.010977 s
+Running test on images/original/TimelyHugeGnu.gif -> images/processed/TimelyHugeGnu.gif
+GIF loaded from file images/original/TimelyHugeGnu.gif with 19 image(s)
+EXECUTION TIME:
+  LOADING:      0.069050 s
+  PARAL filters: 0.129850 s
+  EXPORT: 0.412870 s
+Running test on images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif -> images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif
+GIF loaded from file images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.047474 s
+  PARAL filters: 0.097583 s
+  EXPORT: 0.440342 s

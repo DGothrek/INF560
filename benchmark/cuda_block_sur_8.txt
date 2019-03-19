@@ -1,0 +1,94 @@
+[doubs INF560]$ sh run_test.sh 
+nvcc -Iinclude -c -o obj/gpu_filters.o src/gpu_filters.cu
+mpicc -fopenmp -O3 -Iinclude -c -o obj/main.o src/main.c
+mpicc -fopenmp -O3 -Iinclude  -lm -L/usr/local/cuda/lib64 -lcudart -o sobelf obj/dgif_lib.o obj/egif_lib.o obj/gif_err.o obj/gif_font.o obj/gif_hash.o obj/gifalloc.o obj/gpu_filters.o obj/omp_filters.o obj/mpi_filters.o obj/seq_functions.o obj/main.o obj/openbsd-reallocarray.o obj/quantize.o
+Running test on images/original/051009.vince.gif -> images/processed/051009.vince.gif
+GIF loaded from file images/original/051009.vince.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.051120 s
+  PARAL filters: 0.116748 s
+  EXPORT: 0.182995 s
+Running test on images/original/1.gif -> images/processed/1.gif
+GIF loaded from file images/original/1.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.055989 s
+  PARAL filters: 0.124631 s
+  EXPORT: 0.130418 s
+Running test on images/original/200_s.gif -> images/processed/200_s.gif
+GIF loaded from file images/original/200_s.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.002402 s
+  PARAL filters: 0.093352 s
+  EXPORT: 0.003048 s
+Running test on images/original/9815573.gif -> images/processed/9815573.gif
+GIF loaded from file images/original/9815573.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.049120 s
+  PARAL filters: 0.086191 s
+  EXPORT: 0.061378 s
+Running test on images/original/australian-flag-large.gif -> images/processed/australian-flag-large.gif
+GIF loaded from file images/original/australian-flag-large.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.013835 s
+  PARAL filters: 0.089468 s
+  EXPORT: 0.019304 s
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr.gif
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.359791 s
+  PARAL filters: 1.295844 s
+  EXPORT: 0.710988 s
+Running test on images/original/Campusplan-Mobilitaetsbeschraenkte.gif -> images/processed/Campusplan-Mobilitaetsbeschraenkte.gif
+GIF loaded from file images/original/Campusplan-Mobilitaetsbeschraenkte.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.332033 s
+  PARAL filters: 1.125671 s
+  EXPORT: 1.987976 s
+Running test on images/original/fire.gif -> images/processed/fire.gif
+GIF loaded from file images/original/fire.gif with 33 image(s)
+EXECUTION TIME:
+  LOADING:      0.001629 s
+  PARAL filters: 0.074490 s
+  EXPORT: 0.004560 s
+Running test on images/original/frame_002.gif -> images/processed/frame_002.gif
+GIF loaded from file images/original/frame_002.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.004471 s
+  PARAL filters: 0.084980 s
+  EXPORT: 0.005151 s
+Running test on images/original/giphy-3.gif -> images/processed/giphy-3.gif
+GIF loaded from file images/original/giphy-3.gif with 5 image(s)
+EXECUTION TIME:
+  LOADING:      0.095059 s
+  PARAL filters: 0.162319 s
+  EXPORT: 0.715228 s
+Running test on images/original/Mandelbrot-large.gif -> images/processed/Mandelbrot-large.gif
+GIF loaded from file images/original/Mandelbrot-large.gif with 20 image(s)
+EXECUTION TIME:
+  LOADING:      0.197255 s
+  PARAL filters: 0.372923 s
+  EXPORT: 3.189136 s
+Running test on images/original/porsche.gif -> images/processed/porsche.gif
+GIF loaded from file images/original/porsche.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.002949 s
+  PARAL filters: 0.082916 s
+  EXPORT: 0.003137 s
+Running test on images/original/Produits_sous_linux.gif -> images/processed/Produits_sous_linux.gif
+GIF loaded from file images/original/Produits_sous_linux.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.010231 s
+  PARAL filters: 0.083094 s
+  EXPORT: 0.010736 s
+Running test on images/original/TimelyHugeGnu.gif -> images/processed/TimelyHugeGnu.gif
+GIF loaded from file images/original/TimelyHugeGnu.gif with 19 image(s)
+EXECUTION TIME:
+  LOADING:      0.062099 s
+  PARAL filters: 0.108396 s
+  EXPORT: 0.358964 s
+Running test on images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif -> images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif
+GIF loaded from file images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.040577 s
+  PARAL filters: 0.091928 s
+  EXPORT: 0.356469 s
