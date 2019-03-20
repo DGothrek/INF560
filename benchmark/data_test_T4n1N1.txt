@@ -1,0 +1,91 @@
+make: Rien à faire pour « all ».
+Running test on images/original/051009.vince.gif -> images/processed/051009.vince.gif\n
+GIF loaded from file images/original/051009.vince.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.020152 s
+  Paral filters: 0.069984 s
+  Export:       0.257998 s
+Running test on images/original/1.gif -> images/processed/1.gif\n
+GIF loaded from file images/original/1.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.047175 s
+  Paral filters: 0.096366 s
+  Export:       0.167861 s
+Running test on images/original/200_s.gif -> images/processed/200_s.gif\n
+GIF loaded from file images/original/200_s.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.002047 s
+  Paral filters: 0.003615 s
+  Export:       0.002045 s
+Running test on images/original/9815573.gif -> images/processed/9815573.gif\n
+GIF loaded from file images/original/9815573.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.018569 s
+  Paral filters: 0.037175 s
+  Export:       0.101716 s
+Running test on images/original/australian-flag-large.gif -> images/processed/australian-flag-large.gif\n
+GIF loaded from file images/original/australian-flag-large.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.012491 s
+  Paral filters: 0.040100 s
+  Export:       0.024123 s
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr.gif\n
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.394341 s
+  Paral filters: 3.810612 s
+  Export:       0.816698 s
+Running test on images/original/Campusplan-Mobilitaetsbeschraenkte.gif -> images/processed/Campusplan-Mobilitaetsbeschraenkte.gif\n
+GIF loaded from file images/original/Campusplan-Mobilitaetsbeschraenkte.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.405793 s
+  Paral filters: 3.858132 s
+  Export:       2.109531 s
+Running test on images/original/fire.gif -> images/processed/fire.gif\n
+GIF loaded from file images/original/fire.gif with 33 image(s)
+EXECUTION TIME:
+  LOADING:      0.003219 s
+  Paral filters: 0.003789 s
+  Export:       0.005374 s
+Running test on images/original/frame_002.gif -> images/processed/frame_002.gif\n
+GIF loaded from file images/original/frame_002.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.003783 s
+  Paral filters: 0.014798 s
+  Export:       0.004600 s
+Running test on images/original/giphy-3.gif -> images/processed/giphy-3.gif\n
+GIF loaded from file images/original/giphy-3.gif with 5 image(s)
+EXECUTION TIME:
+  LOADING:      0.127207 s
+  Paral filters: 0.436788 s
+  Export:       1.140398 s
+Running test on images/original/Mandelbrot-large.gif -> images/processed/Mandelbrot-large.gif\n
+GIF loaded from file images/original/Mandelbrot-large.gif with 20 image(s)
+EXECUTION TIME:
+  LOADING:      0.223182 s
+  Paral filters: 0.920695 s
+  Export:       2.669594 s
+Running test on images/original/porsche.gif -> images/processed/porsche.gif\n
+GIF loaded from file images/original/porsche.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.002484 s
+  Paral filters: 0.003016 s
+  Export:       0.002580 s
+Running test on images/original/Produits_sous_linux.gif -> images/processed/Produits_sous_linux.gif\n
+GIF loaded from file images/original/Produits_sous_linux.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.016468 s
+  Paral filters: 0.052743 s
+  Export:       0.011192 s
+Running test on images/original/TimelyHugeGnu.gif -> images/processed/TimelyHugeGnu.gif\n
+GIF loaded from file images/original/TimelyHugeGnu.gif with 19 image(s)
+EXECUTION TIME:
+  LOADING:      0.079855 s
+  Paral filters: 0.151363 s
+  Export:       0.502887 s
+Running test on images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif -> images/processed/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif\n
+GIF loaded from file images/original/tumblr_myxlbtwVEb1qzt4vjo1_r14_500_large.gif with 10 image(s)
+EXECUTION TIME:
+  LOADING:      0.027641 s
+  Paral filters: 0.085527 s
+  Export:       0.516668 s

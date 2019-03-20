@@ -1,0 +1,62 @@
+make: Rien à faire pour « all ».
+Running test on images/original/Campusplan-Hausnr.gif -> images/processed/Campusplan-Hausnr.gif
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.396193 s
+  Paral filters: 12.014168 s
+  Export:       0.801101 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.384219 s
+  Paral filters: 6.338063 s
+  Export:       0.822050 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.387312 s
+  Paral filters: 4.603628 s
+  Export:       0.817628 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.394830 s
+  Paral filters: 3.868564 s
+  Export:       0.822039 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.376882 s
+  Paral filters: 4.342758 s
+  Export:       0.818400 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.395710 s
+  Paral filters: 3.729350 s
+  Export:       0.816586 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.385350 s
+  Paral filters: 3.796970 s
+  Export:       0.827027 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.385609 s
+  Paral filters: 3.817489 s
+  Export:       0.830145 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.396902 s
+  Paral filters: 3.820446 s
+  Export:       0.815466 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.396065 s
+  Paral filters: 3.824425 s
+  Export:       0.820169 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.385083 s
+  Paral filters: 3.837047 s
+  Export:       0.820573 s
+GIF loaded from file images/original/Campusplan-Hausnr.gif with 1 image(s)
+EXECUTION TIME:
+  LOADING:      0.392020 s
+  Paral filters: 3.829461 s
+  Export:       0.821548 s

@@ -264,6 +264,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
   gettimeofday(&t1, NULL);
 #endif
 
+  // If enough images -> split the images.
   // The second test makes sure that the blur radius is not too big for the columns after the cut.
   if (image->n_images > n_process || image->width[0] / n_cut < blur_size)
   {
@@ -292,7 +293,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
 
         if (node == root)
         {
-          printf("  Root %d working on image n°%d\n", rank, im);
+          // printf("  Root %d working on image n°%d\n", rank, im);
           *width = image->width[im];
           *height = image->height[im];
           work_gif->width = width;
@@ -347,7 +348,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
       for (im = rank; im < image->n_images; im += n_process)
       {
         /*  */
-        printf("  Node %d working on image n°%d\n", rank, im);
+        // printf("  Node %d working on image n°%d\n", rank, im);
         *width = image->width[im];
         *height = image->height[im];
         work_gif->width = width;
@@ -371,7 +372,7 @@ int apply_filters_mpi(animated_gif *image, char *output_filename, int root)
     }
   }
   /* There are no good repartitions just considering the images inside a GIF,
-     * we should cut each image to have a better repartition.
+    * we should cut each image to have a better repartition.
     */
   else
   {
