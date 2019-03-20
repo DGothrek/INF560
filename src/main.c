@@ -16,15 +16,6 @@
 
 int blur_size = 5;
 
-/** 
- * Switch execution mode: 
- *  - s: seq
- *  - o: omp
- *  - m: mpi
- *  - g: gpu
- **/
-char mode = 'g';
-
 /** The main function reads the arguments and decide what to do depending
  *  on the type of image, the number of MPI rank and the number of omp threads */
 int main(int argc, char **argv)
@@ -45,6 +36,16 @@ int main(int argc, char **argv)
     printf("%d\n", omp_get_num_threads());
   }
 #endif
+
+  /** 
+   * Switch execution mode: 
+   *  - s: seq
+   *  - o: omp
+   *  - m: mpi
+   *  - g: gpu
+   * Default: m
+   **/
+  char *mode = "m";
   char *input_filename;
   char *output_filename;
   animated_gif *image;
@@ -54,13 +55,14 @@ int main(int argc, char **argv)
   /* Reading arguments */
   if (argc < 3)
   {
-    fprintf(stderr, "Usage: %s input.gif output.gif \n", argv[0]);
+    fprintf(stderr, "Usage: %s input.gif output.gif mode\n", argv[0]);
     return 1;
   }
   input_filename = argv[1];
   output_filename = argv[2];
+  if (argc>=3) mode = argv[3];
 
-  switch (mode)
+  switch (*mode)
   {
 
   /* Code paralellized with mpi */
@@ -188,15 +190,15 @@ void apply_filters_gpu(animated_gif *image)
   gettimeofday(&t1, NULL);
 #endif
 
-//   /* Apply sobel filter on pixels */
-//   apply_sobel_filter_gpu(image);
+  //   /* Apply sobel filter on pixels */
+  //   apply_sobel_filter_gpu(image);
 
-// #if DISPLAY_TIME
-//   gettimeofday(&t2, NULL);
-//   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
-//   printf("  SOBEL filter: %lf s\n", duration);
-//   gettimeofday(&t1, NULL);
-// #endif
+  // #if DISPLAY_TIME
+  //   gettimeofday(&t2, NULL);
+  //   duration = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1e6);
+  //   printf("  SOBEL filter: %lf s\n", duration);
+  //   gettimeofday(&t1, NULL);
+  // #endif
 }
 
 void apply_filters_omp(animated_gif *image)
