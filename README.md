@@ -17,4 +17,4 @@ Pour comparer les images produites avec les images traitées de référence, lan
 
 - [x] Modulariser en plusieurs fichiers
 - [x] Renommer les fonctions (apply_gray, import, etc.) pour garder la version purement seq.
-- [ ] Calculer la taille de l'image et distribuer le travail en fonction.
+- [x] Calculer la taille de l'image et distribuer le travail en fonction.
